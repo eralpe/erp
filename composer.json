@@ -1,0 +1,7 @@
+{
+    "name": "yourname/test2",
+    "description": "Müşteri Yönetim Sistemi",
+    "require": {
+        "tecnickcom/tcpdf": "^6.10"
+    }
+}

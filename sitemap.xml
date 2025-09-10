@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemap>
+    <site>
+        <name>Firma ERP</name>
+        <description>Firma ERP sisteminin site haritası, modüller ve sayfalar için rehber</description>
+        <last_updated>2025-09-08</last_updated>
+    </site>
+
+    <!-- Ana Sayfalar -->
+    <page>
+        <url>login.php</url>
+        <title>Giriş Sayfası</title>
+        <description>Kullanıcı kimlik doğrulama ekranı. Oturum açılmadan diğer sayfalara erişim engellenir.</description>
+        <status>active</status>
+        <related_files>
+            <file>test_password.php</file>
+            <file>generate_csrf_token.php</file>
+        </related_files>
+        <notes>Parola doğrulama ve CSRF token işlemleri için bağımlılıklar kontrol edilmeli.</notes>
+    </page>
+    <page>
+        <url>404.php</url>
+        <title>Hata Sayfası</title>
+        <description>Geçersiz veya bulunamayan sayfalar için hata ekranı.</description>
+        <status>active</status>
+        <notes>Tasarımın template.php ile uyumlu olduğundan emin olun.</notes>
+    </page>
+    <page>
+        <url>index.php</url>
+        <title>Ana Sayfa</title>
+        <description>ERP sisteminin ana dashboard’u. Özet bilgiler, widget’lar ve hızlı erişim bağlantıları içerir.</description>
+        <status>active</status>
+        <notes>Chart.js ile dinamik grafikler eklenebilir (ör. satış trendleri).</notes>
+    </page>
+    <page>
+        <url>logout.php</url>
+        <title>Çıkış</title>
+        <description>Kullanıcı oturumunu kapatma ve login.php’ye yönlendirme.</description>
+        <status>active</status>
+        <notes>Oturum temizleme işleminin güvenli olduğundan emin olun.</notes>
+    </page>
+
+    <!-- Modüller -->
+    <module>
+        <name>Yönetim</name>
+        <description>Sistem yönetimi ile ilgili modüller.</description>
+        <pages>
+            <page>
+                <url>inventory.php</url>
+                <title>Stok Yönetimi</title>
+                <description>Ürün stoklarının yönetimi, düşük stok bildirimleri.</description>
+                <status>active</status>
+                <badge>low_stock</badge>
+                <related_files>
+                    <file>stock.php</file>
+                </related_files>
+                <notes>Stok filtreleme ve arama özelliği geliştirilebilir.</notes>
+            </page>
+            <page>
+                <url>categories.php</url>
+                <title>Kategoriler</title>
+                <description>Ürün kategorilerinin yönetimi.</description>
+                <status>active</status>
+                <badge>category_count</badge>
+                <notes>Kategori hiyerarşisi için ağaç yapısı eklenebilir.</notes>
+            </page>
+            <page>
+                <url>personnel.php</url>
+                <title>Personel Yönetimi</title>
+                <description>Çalışan bilgilerinin yönetimi (listeleme).</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>personnel_details.php</url>
+                        <title>Personel Detayları</title>
+                        <description>Personel bilgisi görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>personnel_edit.php</url>
+                        <title>Personel Düzenleme</title>
+                        <description>Personel bilgisi güncelleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>personnel_delete.php</url>
+                        <title>Personel Silme</title>
+                        <description>Personel kaydı silme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>salary_advance_edit.php</url>
+                        <title>Maaş Avansı Düzenleme</title>
+                        <description>Maaş avansı güncelleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>salary_advance_delete.php</url>
+                        <title>Maaş Avansı Silme</title>
+                        <description>Maaş avansı silme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Personel raporları (ör. performans, maaş geçmişi) eklenebilir.</notes>
+            </page>
+            <page>
+                <url>users.php</url>
+                <title>Kullanıcı Yönetimi</title>
+                <description>Sistem kullanıcılarının yönetimi (roller, izinler).</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>add_user.php</url>
+                        <title>Kullanıcı Ekleme</title>
+                        <description>Yeni kullanıcı oluşturma.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>user_details.php</url>
+                        <title>Kullanıcı Detayları</title>
+                        <description>Kullanıcı bilgisi görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Rol tabanlı erişim kontrolü (RBAC) entegrasyonu önerilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Finans</name>
+        <description>Finansal işlemlerin yönetimi.</description>
+        <pages>
+            <page>
+                <url>cash.php</url>
+                <title>Kasa Yönetimi</title>
+                <description>Nakit akışının takibi ve yönetimi.</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>cash_transaction_details.php</url>
+                        <title>Kasa İşlem Detayları</title>
+                        <description>İşlem detayları görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>cash_transaction_edit.php</url>
+                        <title>Kasa İşlem Düzenleme</title>
+                        <description>İşlem güncelleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>cash_transaction_delete.php</url>
+                        <title>Kasa İşlem Silme</title>
+                        <description>İşlem silme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Kasa raporları ve otomatik dengeleme özelliği eklenebilir.</notes>
+            </page>
+            <page>
+                <url>cash_accounts.php</url>
+                <title>Kasa Hesapları</title>
+                <description>Farklı kasa hesaplarının yönetimi.</description>
+                <status>active</status>
+                <notes>Hesaplar arası transfer özelliği geliştirilebilir.</notes>
+            </page>
+            <page>
+                <url>credits.php</url>
+                <title>Kredi Yönetimi</title>
+                <description>Kredi işlemlerinin takibi ve yönetimi.</description>
+                <status>active</status>
+                <notes>Kredi ödeme planları için görselleştirme eklenebilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Satış ve Satın Alma</name>
+        <description>Satış ve satın alma süreçlerinin yönetimi.</description>
+        <pages>
+            <page>
+                <url>sales.php</url>
+                <title>Satış Yönetimi</title>
+                <description>Satış faturalarının yönetimi, vadesi yaklaşan faturalar.</description>
+                <status>active</status>
+                <badge>overdue_invoices</badge>
+                <related_files>
+                    <file>invoices.php</file>
+                    <file>invoice_payment_edit.php</file>
+                    <file>invoice_payment_delete.php</file>
+                    <file>get_invoices.php</file>
+                </related_files>
+                <notes>Fatura durum grafikleri (ödenen/bekleyen) eklenebilir.</notes>
+            </page>
+            <page>
+                <url>purchase_orders.php</url>
+                <title>Satın Alma Siparişleri</title>
+                <description>Tedarikçi siparişlerinin yönetimi.</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>purchase_order_details.php</url>
+                        <title>Sipariş Detayları</title>
+                        <description>Sipariş detayları görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Sipariş durumu takip sistemi geliştirilebilir.</notes>
+            </page>
+            <page>
+                <url>customers.php</url>
+                <title>Müşteri Yönetimi</title>
+                <description>Müşteri bilgilerinin yönetimi.</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>customers_details.php</url>
+                        <title>Müşteri Detayları</title>
+                        <description>Müşteri bilgisi görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Müşteri segmentasyon ve CRM entegrasyonu önerilir.</notes>
+            </page>
+            <page>
+                <url>suppliers.php</url>
+                <title>Tedarikçi Yönetimi</title>
+                <description>Tedarikçi bilgilerinin yönetimi.</description>
+                <status>active</status>
+                <subpages>
+                    <page>
+                        <url>supplier_details.php</url>
+                        <title>Tedarikçi Detayları</title>
+                        <description>Tedarikçi bilgisi görüntüleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>supplier_edit.php</url>
+                        <title>Tedarikçi Düzenleme</title>
+                        <description>Tedarikçi bilgisi güncelleme.</description>
+                        <status>active</status>
+                    </page>
+                    <page>
+                        <url>supplier_delete.php</url>
+                        <title>Tedarikçi Silme</title>
+                        <description>Tedarikçi kaydı silme.</description>
+                        <status>active</status>
+                    </page>
+                </subpages>
+                <notes>Tedarikçi performans raporları eklenebilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Doküman Yönetimi</name>
+        <description>Sisteme yüklenen belgelerin yönetimi ve arşivlenmesi.</description>
+        <pages>
+            <page>
+                <url>documents.php</url>
+                <title>Doküman Yönetimi</title>
+                <description>Belgelerin (faturalar, sözleşmeler) yönetimi.</description>
+                <status>active</status>
+                <related_files>
+                    <file>uploads</file>
+                </related_files>
+                <notes>Dosya kategorizasyonu ve arama özelliği eklenebilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Raporlar</name>
+        <description>Sistem genelinde raporlar oluşturma.</description>
+        <pages>
+            <page>
+                <url>reports.php</url>
+                <title>Raporlar</title>
+                <description>Stok, finans, satış raporları.</description>
+                <status>active</status>
+                <badge>reminders</badge>
+                <notes>Chart.js ile dinamik rapor grafikleri eklenebilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Mesajlar</name>
+        <description>Kullanıcılar arası veya sistem içi mesajlaşma.</description>
+        <pages>
+            <page>
+                <url>chat.php</url>
+                <title>Mesajlar</title>
+                <description>Mesajlaşma arayüzü.</description>
+                <status>active</status>
+                <badge>notification_count</badge>
+                <related_files>
+                    <file>send_message.php</file>
+                    <file>get_messages.php</file>
+                    <file>typing_status.php</file>
+                    <file>typing_1.txt</file>
+                </related_files>
+                <notes>WebSocket ile gerçek zamanlı mesajlaşma önerilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Bildirimler</name>
+        <description>Bildirimlerin yönetimi ve gösterimi.</description>
+        <pages>
+            <page>
+                <url>check_notifications.php</url>
+                <title>Bildirim Kontrolü</title>
+                <description>Yeni bildirimleri kontrol eden API endpoint’i.</description>
+                <status>active</status>
+                <badge>notification_count</badge>
+                <notes>Pusher ile gerçek zamanlı bildirim entegrasyonu önerilir.</notes>
+            </page>
+            <page>
+                <url>notifications.php</url>
+                <title>Bildirim Paneli</title>
+                <description>Bildirimlerin listelendiği ve yönetildiği panel.</description>
+                <status>proposed</status>
+                <notes>Bildirim filtreleme ve arşivleme özelliği geliştirilmeli.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Ayarlar</name>
+        <description>Kullanıcı ve sistem ayarlarının yönetimi.</description>
+        <pages>
+            <page>
+                <url>set_theme.php</url>
+                <title>Tema Ayarları</title>
+                <description>Tema ayarlarını güncelleyen API endpoint’i.</description>
+                <status>active</status>
+                <notes>Tema geçişinin tüm sayfalarda tutarlılığı kontrol edilmeli.</notes>
+            </page>
+            <page>
+                <url>settings.php</url>
+                <title>Ayarlar Paneli</title>
+                <description>Kullanıcı ve sistem ayarlarının yönetimi.</description>
+                <status>proposed</status>
+                <subpages>
+                    <page>
+                        <url>settings.php?tab=user</url>
+                        <title>Kullanıcı Ayarları</title>
+                        <description>Profil, parola, bildirim tercihleri.</description>
+                        <status>proposed</status>
+                    </page>
+                    <page>
+                        <url>settings.php?tab=system</url>
+                        <title>Sistem Ayarları</title>
+                        <description>Admin için genel ayarlar.</description>
+                        <status>proposed</status>
+                    </page>
+                    <page>
+                        <url>settings.php?tab=pinned</url>
+                        <title>Hızlı Erişim</title>
+                        <description>Sidebar’da sabitlenen öğelerin düzenlenmesi.</description>
+                        <status>proposed</status>
+                    </page>
+                </subpages>
+                <notes>RBAC entegrasyonu için ayarlar paneli kritik.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <module>
+        <name>Global Arama</name>
+        <description>Tüm modüllerde arama yapabilen sayfa.</description>
+        <pages>
+            <page>
+                <url>search.php</url>
+                <title>Global Arama</title>
+                <description>Stok, müşteri, fatura araması.</description>
+                <status>proposed</status>
+                <notes>Elasticsearch veya MySQL full-text search entegrasyonu önerilir.</notes>
+            </page>
+        </pages>
+    </module>
+
+    <!-- Teknik Dosyalar -->
+    <technical_files>
+        <file>
+            <name>composer.json</name>
+            <description>PHP bağımlılıklarını yöneten Composer yapılandırma dosyası.</description>
+            <status>active</status>
+            <notes>Bağımlılıkların güncel olduğundan emin olun.</notes>
+        </file>
+        <file>
+            <name>composer.lock</name>
+            <description>Composer bağımlılıklarının sabitlenmiş versiyonları.</description>
+            <status>active</status>
+            <notes>Güncellemeler öncesi yedek alınmalı.</notes>
+        </file>
+        <file>
+            <name>config</name>
+            <description>Veritabanı ve sistem yapılandırma dosyaları (muhtemelen config/db.php).</description>
+            <status>active</status>
+            <notes>Güvenli bağlantı ayarları kontrol edilmeli.</notes>
+        </file>
+        <file>
+            <name>functions</name>
+            <description>Genel yardımcı fonksiyonlar (muhtemelen functions.php).</description>
+            <status>active</status>
+            <notes>Fonksiyonların dokümantasyonu yapılmalı.</notes>
+        </file>
+        <file>
+            <name>uploads</name>
+            <description>Belge ve dosyaların saklandığı klasör.</description>
+            <status>active</status>
+            <notes>Dosya yükleme güvenliği (dosya türü, boyut kontrolü) sağlanmalı.</notes>
+        </file>
+        <file>
+            <name>vendor</name>
+            <description>Composer ile yüklenen üçüncü taraf kütüphaneler.</description>
+            <status>active</status>
+            <notes>Gereksiz bağımlılıklar temizlenmeli.</notes>
+        </file>
+    </technical_files>
+
+    <!-- Geliştirme Kontrol Listesi -->
+    <checklist>
+        <item status="pending">Mevcut sayfaların (inventory.php, sales.php, vb.) işlevselliği test edilmeli.</item>
+        <item status="pending">Önerilen sayfalar (notifications.php, settings.php, search.php) için backend API’ler geliştirilmeli.</item>
+        <item status="pending">Rol tabanlı erişim kontrolü (RBAC) için $_SESSION['role'] entegrasyonu.</item>
+        <item status="pending">PWA desteği için manifest.json ve service-worker.js eklenmeli.</item>
+        <item status="pending">Bildirimler için WebSocket/Pusher entegrasyonu test edilmeli.</item>
+        <item status="pending">Dashboard için Chart.js ile dinamik grafikler geliştirilmeli.</item>
+    </checklist>
+</sitemap>
