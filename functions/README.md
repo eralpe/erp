@@ -1,0 +1,10 @@
+- getCashAccounts: Kasa hesaplarını listeler.
+- addCashTransaction: Yeni kasa işlemi ekler (personel ödemeleri için debit türü kullanılır).
+- getCashTransactions: Kasa hareketlerini listeler.
+- getCashBalance: Toplam kasa bakiyesini hesaplar.
+- getCashAccountById: Belirli bir kasa hesabını getirir.
+- addCashAccount: Yeni kasa hesabı ekler.
+- updateCashAccount: Kasa hesabını günceller.
+- getCashTransactionById: Belirli bir kasa işlemini getirir.
+- updateCashTransaction: Kasa işlemini günceller.
+- deleteCashTransaction: Kasa işlemini siler.
