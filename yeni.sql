@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1:3306
--- Üretim Zamanı: 09 Eyl 2025, 20:41:14
+-- Üretim Zamanı: 12 Eyl 2025, 21:30:00
 -- Sunucu sürümü: 8.2.0
 -- PHP Sürümü: 8.2.13
 
@@ -74,7 +74,31 @@ CREATE TABLE IF NOT EXISTS `advances` (
   PRIMARY KEY (`id`),
   KEY `personel_id` (`personel_id`),
   KEY `category_id` (`category_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `assets`
+--
+
+DROP TABLE IF EXISTS `assets`;
+CREATE TABLE IF NOT EXISTS `assets` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `serial_number` varchar(50) DEFAULT NULL,
+  `value` decimal(10,2) DEFAULT '0.00',
+  `supplier_id` int DEFAULT NULL,
+  `personnel_id` int DEFAULT NULL,
+  `description` text,
+  `status` enum('active','in_repair','deactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `serial_number` (`serial_number`),
+  KEY `supplier_id` (`supplier_id`),
+  KEY `personnel_id` (`personnel_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -91,16 +115,14 @@ CREATE TABLE IF NOT EXISTS `cash_accounts` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `cash_accounts`
 --
 
 INSERT INTO `cash_accounts` (`id`, `name`, `currency`, `balance`, `created_at`, `description`) VALUES
-(13, 'Ana Kasa', 'TRY', 110900.00, '2025-09-04 06:49:18', ''),
-(14, 'Dolar Hesabı', 'USD', 5000.00, '2025-09-04 06:49:18', ''),
-(15, 'Euro Hesabı', 'EUR', 250.00, '2025-09-04 06:49:18', '');
+(1, 'ANA KASA', 'TRY', 0.00, '2025-09-12 21:18:15', '');
 
 -- --------------------------------------------------------
 
@@ -113,46 +135,18 @@ CREATE TABLE IF NOT EXISTS `cash_transactions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `cash_id` int NOT NULL,
   `amount` decimal(15,2) NOT NULL,
-  `transaction_type` enum('income','expense') NOT NULL,
   `currency` varchar(3) NOT NULL,
   `amount_try` decimal(15,2) NOT NULL,
-  `type` enum('in','out') NOT NULL,
+  `type` enum('in','out','debit') NOT NULL,
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `category_id` int DEFAULT NULL,
   `account_id` int NOT NULL,
+  `transaction_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cash_id` (`cash_id`),
   KEY `category_id` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `cash_transactions`
---
-
-INSERT INTO `cash_transactions` (`id`, `cash_id`, `amount`, `transaction_type`, `currency`, `amount_try`, `type`, `description`, `created_at`, `category_id`, `account_id`) VALUES
-(15, 13, 155.00, 'income', 'TRY', 155.00, 'in', '', '2025-09-03 18:09:55', 2, 0),
-(18, 0, 500.00, 'income', 'TRY', 500.00, '', 'Fatura Ödemesi: INV', '2025-09-04 11:45:28', NULL, 15),
-(19, 0, 500.00, 'income', 'TRY', 500.00, '', 'Fatura Ödemesi: INV', '2025-09-04 11:46:04', NULL, 13),
-(20, 0, 10000.00, 'income', 'TRY', 10000.00, '', 'Fatura Ödemesi: INV', '2025-09-04 11:46:32', NULL, 13),
-(21, 0, 10.00, 'income', 'USD', 340.00, '', 'Fatura Ödemesi: INVINV001', '2025-09-04 13:56:39', NULL, 15),
-(22, 0, 10.00, 'income', 'EUR', 380.00, '', 'Fatura Ödemesi: INVINV001', '2025-09-04 13:56:48', NULL, 15),
-(23, 0, 25.00, 'income', 'USD', 850.00, '', 'Fatura Ödemesi: INVINV002', '2025-09-04 19:07:45', NULL, 13),
-(24, 0, 1000.00, 'income', 'TRY', 1000.00, '', 'Fatura Ödemesi: INVINV002', '2025-09-04 19:07:58', NULL, 13),
-(25, 0, 250.00, 'income', 'TRY', 250.00, '', 'Fatura Ödemesi: INVINV002', '2025-09-04 19:08:06', NULL, 13),
-(26, 0, 2500.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 13)', '2025-09-03 21:00:00', NULL, 13),
-(27, 0, 2000.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 1)', '2025-09-03 21:00:00', NULL, 15),
-(28, 0, 2500.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 7)', '2025-09-03 21:00:00', NULL, 13),
-(29, 0, 2500.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 14)', '2025-09-03 21:00:00', NULL, 13),
-(30, 0, 2000.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 8)', '2025-09-03 21:00:00', NULL, 13),
-(31, 0, 15000.00, 'income', '', 0.00, '', 'Personel maaşı (ID: 1)', '2025-09-01 07:00:00', NULL, 1),
-(32, 0, 5000.00, 'income', '', 0.00, '', 'Personel avansı (ID: 1)', '2025-09-03 11:00:00', NULL, 1),
-(33, 0, 4500.00, 'income', '', 0.00, '', 'Personel advance ödemesi (ID: 3)', '2025-09-03 21:00:00', NULL, 16),
-(34, 0, 2000.00, 'income', '', 0.00, '', 'Kredi taksit ödemesi (ID: 2)', '2025-09-03 21:00:00', NULL, 13),
-(35, 0, 7000.00, 'income', '', 0.00, '', 'Personel advance ödemesi (ID: 5)', '2025-09-06 21:00:00', NULL, 13),
-(36, 0, 7000.00, 'income', '', 0.00, '', 'Personel salary ödemesi (ID: 5)', '2025-09-08 21:00:00', NULL, 13),
-(37, 0, 6000.00, 'income', '', 0.00, '', 'Personel advance ödemesi (ID: 6)', '2025-09-06 21:00:00', NULL, 13),
-(38, 0, 7000.00, 'income', '', 0.00, '', 'Personel advance ödemesi (ID: 7)', '2025-09-06 21:00:00', NULL, 13);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -166,26 +160,11 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `name` varchar(100) NOT NULL,
   `type` enum('income','expense','both') NOT NULL DEFAULT 'both',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `categories`
---
-
-INSERT INTO `categories` (`id`, `name`, `type`, `created_at`) VALUES
-(1, 'Maaş', 'expense', '2025-09-02 09:21:03'),
-(2, 'Satış Geliri', 'income', '2025-09-02 09:21:03'),
-(3, 'Kira', 'expense', '2025-09-02 09:21:03'),
-(4, 'Diğer', 'both', '2025-09-02 09:21:03'),
-(5, 'Maaş Avansı', 'expense', '2025-09-02 11:42:39'),
-(6, 'Fatura Ödemesi', 'expense', '2025-09-02 12:06:06'),
-(7, 'Satış Ödemesi', 'income', '2025-09-02 14:58:38'),
-(8, 'Transfer Gideri', 'expense', '2025-09-03 19:39:09'),
-(9, 'Transfer Geliri', 'income', '2025-09-03 19:39:09'),
-(19, 'Elektronik', 'both', '2025-09-06 13:40:07'),
-(20, 'Gıda', 'both', '2025-09-06 13:40:07'),
-(21, 'eeetdfs', 'both', '2025-09-09 13:22:14');
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `description` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -204,27 +183,7 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
   PRIMARY KEY (`id`),
   KEY `sender_id` (`sender_id`),
   KEY `receiver_id` (`receiver_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `chat_messages`
---
-
-INSERT INTO `chat_messages` (`id`, `sender_id`, `receiver_id`, `message`, `is_read`, `created_at`) VALUES
-(1, 1, 2, 'Merhaba, nasılsın?', 1, '2025-09-07 08:18:00'),
-(2, 2, 1, 'İyiyim, sen nasılsın?', 1, '2025-09-07 08:18:00'),
-(3, 1, 3, 'Toplantı ne zaman?', 1, '2025-09-07 08:18:00'),
-(7, 2, 1, 'göt', 1, '2025-09-08 07:26:37'),
-(6, 2, 1, 'test', 1, '2025-09-08 07:26:30'),
-(8, 2, 4, 'merhaba', 0, '2025-09-08 07:29:54'),
-(9, 2, 1, 'zd', 1, '2025-09-08 08:40:16'),
-(10, 2, 1, 'd', 1, '2025-09-08 08:40:19'),
-(11, 2, 1, 'm', 1, '2025-09-08 08:40:23'),
-(12, 2, 1, 'test', 1, '2025-09-08 08:47:14'),
-(13, 2, 1, 'test', 1, '2025-09-08 08:47:15'),
-(14, 2, 1, 'tets', 1, '2025-09-08 08:47:16'),
-(15, 2, 1, 'test', 1, '2025-09-08 09:26:31'),
-(16, 2, 1, 'test', 1, '2025-09-08 17:27:57');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -244,15 +203,7 @@ CREATE TABLE IF NOT EXISTS `credits` (
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `credits`
---
-
-INSERT INTO `credits` (`id`, `bank_name`, `amount`, `interest_rate`, `due_date`, `installment_count`, `currency`, `description`, `created_at`) VALUES
-(1, '', 10000.00, NULL, '0000-00-00', 0, '', 'Test Credit 1', '2025-09-01 07:00:00'),
-(2, '', 5000.00, NULL, '0000-00-00', 0, '', 'Test Credit 2', '2025-09-02 09:00:00');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tetikleyiciler `credits`
@@ -285,27 +236,7 @@ CREATE TABLE IF NOT EXISTS `credit_installments` (
   `paid_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `credit_id` (`credit_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `credit_installments`
---
-
-INSERT INTO `credit_installments` (`id`, `credit_id`, `amount`, `due_date`, `status`, `paid_amount`, `paid_date`) VALUES
-(1, 1, 2000.00, '2025-09-10', 'paid', 2000.00, '2025-09-04 00:00:00'),
-(2, 1, 2000.00, '2025-10-10', 'paid', 2000.00, '2025-09-04 00:00:00'),
-(3, 1, 2000.00, '2025-11-10', 'pending', 0.00, NULL),
-(4, 1, 2000.00, '2025-12-10', 'pending', 0.00, NULL),
-(5, 1, 2000.00, '2026-01-10', 'pending', 0.00, NULL),
-(6, 2, 2500.00, '2025-09-05', 'paid', 2500.00, '2025-09-04 00:00:00'),
-(7, 2, 2500.00, '2025-10-05', 'paid', 2500.00, '2025-09-04 00:00:00'),
-(8, 1, 2000.00, '2025-09-10', 'paid', 2000.00, '2025-09-04 00:00:00'),
-(9, 1, 2000.00, '2025-10-10', 'pending', 0.00, NULL),
-(10, 1, 2000.00, '2025-11-10', 'pending', 0.00, NULL),
-(11, 1, 2000.00, '2025-12-10', 'pending', 0.00, NULL),
-(12, 1, 2000.00, '2026-01-10', 'pending', 0.00, NULL),
-(13, 2, 2500.00, '2025-09-05', 'paid', 2500.00, '2025-09-04 00:00:00'),
-(14, 2, 2500.00, '2025-10-05', 'paid', 2500.00, '2025-09-04 00:00:00');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -324,16 +255,7 @@ CREATE TABLE IF NOT EXISTS `credit_payments` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `credit_id` (`credit_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `credit_payments`
---
-
-INSERT INTO `credit_payments` (`id`, `credit_id`, `amount`, `currency`, `payment_date`, `description`, `created_at`) VALUES
-(1, 1, 1000.00, 'USD', '2025-09-02', '', '2025-09-02 08:56:41'),
-(2, 1, 100.00, 'TRY', '2025-09-02', '', '2025-09-02 18:23:09'),
-(3, 2, 5000.00, 'TRY', '2025-09-02', '', '2025-09-03 13:15:34');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tetikleyiciler `credit_payments`
@@ -358,23 +280,24 @@ DROP TABLE IF EXISTS `customers`;
 CREATE TABLE IF NOT EXISTS `customers` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `contact` varchar(100) DEFAULT NULL,
   `address` text,
   `balance` decimal(15,2) DEFAULT '0.00',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `credit_limit` decimal(10,2) DEFAULT '0.00',
+  `due_days` int DEFAULT '15',
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `customers`
 --
 
-INSERT INTO `customers` (`id`, `name`, `contact`, `address`, `balance`, `created_at`, `email`, `phone`, `status`) VALUES
-(1, 'eralp ekemen', '05310281767', 'ALÇITEPE', -300.00, '2025-09-06 06:18:02', 'eralp.ekemen@sabl.com.tr', '05310281767', 'inactive'),
-(2, 'test', NULL, 'gfhlğşfögöş yturkey', 150.00, '2025-09-06 06:54:28', 'test@test.com', '05378502174', 'active');
+INSERT INTO `customers` (`id`, `name`, `address`, `balance`, `created_at`, `email`, `phone`, `status`, `credit_limit`, `due_days`, `updated_at`) VALUES
+(1, 'TEST', '', 0.00, '2025-09-12 21:18:41', 'test@test.com', '00000000000', 'active', 2000.00, 15, NULL);
 
 -- --------------------------------------------------------
 
@@ -392,17 +315,7 @@ CREATE TABLE IF NOT EXISTS `customer_transactions` (
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `customer_transactions`
---
-
-INSERT INTO `customer_transactions` (`id`, `customer_id`, `amount`, `type`, `description`, `created_at`) VALUES
-(1, 1, 150.00, 'debit', 'Manuel bakiye güncelleme', '2025-09-06 09:22:16'),
-(2, 1, 50.00, 'credit', 'Manuel bakiye güncelleme', '2025-09-06 09:54:03'),
-(3, 1, 200.00, 'debit', 'Manuel bakiye güncelleme', '2025-09-06 09:54:11'),
-(4, 2, 150.00, 'credit', 'Manuel bakiye güncelleme', '2025-09-06 13:45:41');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -421,16 +334,7 @@ CREATE TABLE IF NOT EXISTS `documents` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `documents`
---
-
-INSERT INTO `documents` (`id`, `file_name`, `file_path`, `related_table`, `related_id`, `description`, `created_at`, `updated_at`) VALUES
-(2, 'invoice1.pdf', 'uploads/invoice1.pdf', 'invoices', 1, 'Fatura 1', '2025-09-01 10:00:00', NULL),
-(3, 'sales_invoice1.pdf', 'uploads/sales_invoice1.pdf', 'sales_invoices', 1, 'Satış faturası 1', '2025-09-01 11:00:00', NULL),
-(4, 'po1.pdf', 'uploads/po1.pdf', 'purchase_orders', 1, 'Satın alma siparişi 1', '2025-09-01 13:00:00', NULL);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -445,18 +349,7 @@ CREATE TABLE IF NOT EXISTS `exchange_rates` (
   `rate` decimal(10,4) NOT NULL,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `exchange_rates`
---
-
-INSERT INTO `exchange_rates` (`id`, `currency_code`, `rate`, `updated_at`) VALUES
-(1, 'TRY', 1.0000, '2025-09-02 08:39:58'),
-(2, 'USD', 34.0000, '2025-09-02 08:39:58'),
-(3, 'EUR', 37.0000, '2025-09-02 08:39:58'),
-(10, 'EUR', 38.0000, '2025-09-04 06:49:37'),
-(9, 'USD', 34.0000, '2025-09-04 06:49:37');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -478,17 +371,7 @@ CREATE TABLE IF NOT EXISTS `inventory` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `product_code` (`product_code`),
   KEY `category_id` (`category_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `inventory`
---
-
-INSERT INTO `inventory` (`id`, `product_code`, `product_name`, `category_id`, `unit`, `stock_quantity`, `min_stock_level`, `created_at`, `updated_at`) VALUES
-(1, '12345', 'test', NULL, '1', 6.00, 1.00, '2025-09-06 13:36:26', '2025-09-08 18:56:17'),
-(2, 'P001', 'Laptop', 19, 'Adet', 20.00, 5.00, '2025-09-06 13:40:07', '2025-09-08 18:49:48'),
-(3, 'P002', 'Ekmek', 20, 'Adet', 100.00, 20.00, '2025-09-06 13:40:07', '2025-09-06 13:40:38'),
-(4, 'test', 'test', 20, 'adet', 2.00, 2.00, '2025-09-06 14:29:28', '2025-09-06 14:29:28');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -508,16 +391,7 @@ CREATE TABLE IF NOT EXISTS `inventory_transactions` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `inventory_transactions`
---
-
-INSERT INTO `inventory_transactions` (`id`, `product_id`, `type`, `quantity`, `description`, `related_id`, `related_type`, `created_at`) VALUES
-(1, 2, 'in', 10.00, '', NULL, '', '2025-09-08 18:49:48'),
-(2, 1, 'out', 9.00, '', NULL, '', '2025-09-08 18:51:19'),
-(3, 1, 'in', 5.00, '', NULL, '', '2025-09-08 18:56:17');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -541,14 +415,54 @@ CREATE TABLE IF NOT EXISTS `invoices` (
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_supplier_invoice` (`supplier_id`,`invoice_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `invoices`
 --
 
 INSERT INTO `invoices` (`id`, `supplier_id`, `invoice_number`, `amount`, `currency`, `amount_try`, `issue_date`, `due_date`, `description`, `created_at`, `status`, `updated_at`) VALUES
-(5, 8, 'ELF0001', 7095.00, '', 0.00, '2025-08-31', '2025-09-07', NULL, '2025-09-05 19:47:17', 'pending', '2025-09-05 22:47:17');
+(7, 3, '1', 560.00, '', 0.00, '2025-08-25', '2025-09-01', NULL, '2025-09-11 15:10:28', 'pending', '2025-09-12 16:25:30'),
+(8, 2, '1', 2360.00, '', 0.00, '2025-09-07', '2025-09-14', NULL, '2025-09-11 15:34:53', 'pending', '2025-09-11 18:34:53'),
+(9, 3, '2', 560.00, '', 0.00, '2025-09-01', '2025-09-08', NULL, '2025-09-11 15:36:55', 'pending', '2025-09-12 16:25:56'),
+(10, 1, 'M012025000002230', 5250.00, '', 0.00, '2025-09-05', '2025-09-11', NULL, '2025-09-11 15:45:06', 'pending', '2025-09-11 18:45:06'),
+(12, 1, 'm012025000002293', 1750.56, '', 0.00, '2025-09-12', '2025-09-19', NULL, '2025-09-12 13:48:20', 'pending', '2025-09-12 16:52:21');
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `invoice_items`
+--
+
+DROP TABLE IF EXISTS `invoice_items`;
+CREATE TABLE IF NOT EXISTS `invoice_items` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `invoice_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `total` decimal(15,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `invoice_id` (`invoice_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Tablo döküm verisi `invoice_items`
+--
+
+INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `price`, `total`) VALUES
+(4, 7, 3, 7, 15.00, 105.00),
+(5, 7, 2, 14, 20.00, 280.00),
+(6, 7, 1, 7, 25.00, 175.00),
+(7, 9, 3, 7, 15.00, 105.00),
+(8, 9, 2, 7, 20.00, 140.00),
+(9, 9, 2, 7, 20.00, 140.00),
+(10, 9, 1, 7, 25.00, 175.00),
+(11, 12, 5, 48, 10.42, 500.16),
+(12, 12, 5, 48, 10.42, 500.16),
+(13, 12, 5, 24, 10.42, 250.08),
+(14, 12, 4, 48, 10.42, 500.16);
 
 -- --------------------------------------------------------
 
@@ -572,21 +486,7 @@ CREATE TABLE IF NOT EXISTS `invoice_payments` (
   KEY `invoice_id` (`invoice_id`),
   KEY `transaction_id` (`transaction_id`),
   KEY `fk_invoice_payments_account_id` (`account_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `invoice_payments`
---
-
-INSERT INTO `invoice_payments` (`id`, `invoice_id`, `account_id`, `transaction_id`, `amount`, `currency`, `description`, `created_at`, `amount_try`, `payment_date`) VALUES
-(1, 3, 15, 0, 500.00, 'TRY', NULL, '2025-09-04 11:45:28', 500.00, '2025-09-04'),
-(2, 6, 13, 0, 500.00, 'TRY', NULL, '2025-09-04 11:46:04', 500.00, '2025-09-04'),
-(3, 5, 13, 0, 10000.00, 'TRY', NULL, '2025-09-04 11:46:32', 10000.00, '2025-09-04'),
-(4, 3, 15, 0, 10.00, 'USD', NULL, '2025-09-04 13:56:39', 340.00, '2025-09-04'),
-(5, 3, 15, 0, 10.00, 'EUR', NULL, '2025-09-04 13:56:48', 380.00, '2025-09-04'),
-(6, 7, 13, 0, 25.00, 'USD', NULL, '2025-09-04 19:07:45', 850.00, '2025-09-04'),
-(7, 7, 13, 0, 1000.00, 'TRY', NULL, '2025-09-04 19:07:58', 1000.00, '2025-09-04'),
-(8, 7, 13, 0, 250.00, 'TRY', NULL, '2025-09-04 19:08:06', 250.00, '2025-09-04');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -601,210 +501,265 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `details` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=198 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `logs`
 --
 
 INSERT INTO `logs` (`id`, `action`, `details`, `created_at`) VALUES
-(1, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:42:21'),
-(2, 'error', 'Tedarikçi güncelleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'updated_at\' in \'field list\', POST: {\"csrf_token\":\"105938fd0044b99f57243ef2925b47c7358453db12073f2ee68f857f3e1ead7e\",\"id\":\"7\",\"update_supplier\":\"1\",\"name\":\"RE\\u0130S GIDA\",\"balance\":\"20245.00\",\"contact_name\":\"MUSTAFA\",\"email\":\"\",\"phone\":\"\",\"address\":\"\",\"contact\":\"\"}', '2025-09-05 19:42:34'),
-(3, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:42:34'),
-(4, 'error', 'Tedarikçi güncelleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"105938fd0044b99f57243ef2925b47c7358453db12073f2ee68f857f3e1ead7e\",\"id\":\"7\",\"update_supplier\":\"1\",\"name\":\"RE\\u0130S GIDA\",\"balance\":\"20245.00\",\"contact_name\":\"MUSTAFA\",\"email\":\"\",\"phone\":\"\",\"address\":\"\",\"contact\":\"\"}', '2025-09-05 19:43:08'),
-(5, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:43:08'),
-(6, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:43:09'),
-(7, 'error', 'Tedarikçi güncelleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'updated_at\' in \'field list\', POST: {\"csrf_token\":\"28edff962bb52f14e00adfc24e0149aa4a2c894e09fcb2ad89d7278c3e013ab9\",\"id\":\"7\",\"update_supplier\":\"1\",\"name\":\"RE\\u0130S GIDA\",\"balance\":\"20245.00\",\"contact_name\":\"MUSTAFA\",\"email\":\"\",\"phone\":\"\",\"address\":\"\",\"contact\":\"\"}', '2025-09-05 19:43:17'),
-(8, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:43:17'),
-(9, 'error', 'Fatura ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'updated_at\' in \'field list\', POST: {\"csrf_token\":\"4a27aac9f4dda76eaf3dd3542ad7de5b0b5576f11b2cf381c2e5b2622ce28a84\",\"supplier_id\":\"7\",\"add_invoice\":\"1\",\"invoice_number\":\"1\",\"amount\":\"7095\",\"issue_date\":\"2025-08-31\",\"due_date\":\"2025-09-07\"}', '2025-09-05 19:43:40'),
-(10, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:43:40'),
-(11, 'error', 'Fatura ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"4a27aac9f4dda76eaf3dd3542ad7de5b0b5576f11b2cf381c2e5b2622ce28a84\",\"supplier_id\":\"7\",\"add_invoice\":\"1\",\"invoice_number\":\"1\",\"amount\":\"7095\",\"issue_date\":\"2025-08-31\",\"due_date\":\"2025-09-07\"}', '2025-09-05 19:45:44'),
-(12, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:45:44'),
-(13, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:45:45'),
-(14, 'info', 'Fatura #1 tedarikçi ID 7 için eklendi.', '2025-09-05 19:45:58'),
-(15, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:45:58'),
-(16, 'info', 'get_invoices.php: 7 için 1 fatura döndürüldü', '2025-09-05 19:46:01'),
-(17, 'info', 'get_invoices.php: 7 için 1 fatura döndürüldü', '2025-09-05 19:46:01'),
-(18, 'info', 'get_invoices.php: 7 için 1 fatura döndürüldü', '2025-09-05 19:46:06'),
-(19, 'info', 'get_invoices.php: 7 için 1 fatura döndürüldü', '2025-09-05 19:46:06'),
-(20, 'info', 'Fetched 0 suppliers and 3 cash accounts', '2025-09-05 19:46:34'),
-(21, 'info', 'Tedarikçi REİS GIDA eklendi.', '2025-09-05 19:46:55'),
-(22, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:46:55'),
-(23, 'info', 'Fatura #ELF0001 tedarikçi ID 8 için eklendi.', '2025-09-05 19:47:17'),
-(24, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:47:17'),
-(25, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:47:20'),
-(26, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:47:20'),
-(27, 'info', 'Tedarikçi ID 8 güncellendi: REİS GIDA', '2025-09-05 19:47:49'),
-(28, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:47:49'),
-(29, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:48:02'),
-(30, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:48:02'),
-(31, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:49:06'),
-(32, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:49:17'),
-(33, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:49:22'),
-(34, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:49:25'),
-(35, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:54:02'),
-(36, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:54:04'),
-(37, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 19:54:04'),
-(38, 'error', 'Ödeme ekleme hatası: SQLSTATE[23000]: Integrity constraint violation: 1048 Column \'invoice_id\' cannot be null, POST: {\"csrf_token\":\"b0c83de2354eb75af7687faf4f3e900f8aecd6d295d0a1fa86c31e1c67822811\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-05\"}', '2025-09-05 19:54:19'),
-(39, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 19:54:19'),
-(40, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"b0c83de2354eb75af7687faf4f3e900f8aecd6d295d0a1fa86c31e1c67822811\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-05\"}', '2025-09-05 20:19:18'),
-(41, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:19:18'),
-(42, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:19:19'),
-(43, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:19:20'),
-(44, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:19:20'),
-(45, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:19:35'),
-(46, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:19:38'),
-(47, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:19:38'),
-(48, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"fa13956655c30b48e060cbd4ba27084a44da5b12c869c0bee667c848a020f75b\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:19:51'),
-(49, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:19:51'),
-(50, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:22:33'),
-(51, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:22:34'),
-(52, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:22:34'),
-(53, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"f0e65092c63515c7a1fef45fa035e255ce71e04b5ac6e69966829cf025d4120b\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:22:43'),
-(54, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:22:43'),
-(55, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"f0e65092c63515c7a1fef45fa035e255ce71e04b5ac6e69966829cf025d4120b\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:23:25'),
-(56, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:23:25'),
-(57, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:23:26'),
-(58, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:23:29'),
-(59, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:23:29'),
-(60, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"9cc3a24933a72e9c9b856621ecc5549cea1449cdd213a3ee07d325317d1e60b1\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:23:38'),
-(61, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:23:38'),
-(62, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"9cc3a24933a72e9c9b856621ecc5549cea1449cdd213a3ee07d325317d1e60b1\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:24:52'),
-(63, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:24:52'),
-(64, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:24:52'),
-(65, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:24:53'),
-(66, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:24:53'),
-(67, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"8114333eb6d45314e26c6ac89688aa9deee3af1cbbe7b65879e98f95d63b60fd\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:25:04'),
-(68, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:25:04'),
-(69, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:25:45'),
-(70, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:25:46'),
-(71, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:25:46'),
-(72, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"1574a8dace4e0c4747d6ee34760971419b1f845fda442179b355561a845b29c8\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:25:57'),
-(73, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:25:57'),
-(74, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"1574a8dace4e0c4747d6ee34760971419b1f845fda442179b355561a845b29c8\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-08-31\"}', '2025-09-05 20:28:21'),
-(75, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:28:21'),
-(76, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:28:23'),
-(77, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:28:24'),
-(78, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:28:26'),
-(79, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-05 20:28:26'),
-(80, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"6e5df041a269dd0a85fa885d18b2153089d95bb094c9ef5885feaf84807cef43\",\"supplier_id\":\"8\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"8000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-05\"}', '2025-09-05 20:28:33'),
-(81, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-05 20:28:33'),
-(82, 'info', 'Fetched 5 inventory items', '2025-09-06 06:17:10'),
-(83, 'info', 'Fetched 5 inventory items', '2025-09-06 06:17:13'),
-(84, 'info', 'Fetched 5 inventory items', '2025-09-06 06:17:17'),
-(85, 'info', 'Müşteri bakiyesi güncellendi: debit 150 TRY for customer ID 1', '2025-09-06 06:22:16'),
-(86, 'info', 'Müşteri bakiyesi güncellendi: credit 50 TRY for customer ID 1', '2025-09-06 06:54:03'),
-(87, 'info', 'Müşteri bakiyesi güncellendi: debit 200 TRY for customer ID 1', '2025-09-06 06:54:11'),
-(88, 'info', 'Müşteri bakiyesi güncellendi: credit 150 TRY for customer ID 2', '2025-09-06 10:45:41'),
-(89, 'info', 'Fetched 5 inventory items', '2025-09-06 10:54:25'),
-(90, 'info', 'Fetched 5 inventory items', '2025-09-06 10:54:26'),
-(91, 'info', 'Fetched 5 inventory items', '2025-09-06 10:54:28'),
-(92, 'info', 'Fetched 5 inventory items', '2025-09-06 11:04:28'),
-(93, 'info', 'Fetched 5 inventory items', '2025-09-06 11:04:35'),
-(94, 'info', 'Fetched 5 inventory items', '2025-09-06 11:04:35'),
-(95, 'info', 'Fetched 5 inventory items', '2025-09-06 11:04:36'),
-(96, 'info', 'Fetched 5 inventory items', '2025-09-06 11:04:36'),
-(97, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-08 18:45:00'),
-(98, 'info', 'Total payments for personnel ID 3: 15000', '2025-09-08 20:34:14'),
-(99, 'info', 'Total payments for personnel ID 4: 12000', '2025-09-08 20:34:14'),
-(100, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, and 1 leaves', '2025-09-08 20:34:14'),
-(101, 'info', 'Total payments for personnel ID 3: 15000', '2025-09-09 07:02:42'),
-(102, 'info', 'Total payments for personnel ID 4: 12000', '2025-09-09 07:02:42'),
-(103, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, and 1 leaves', '2025-09-09 07:02:42'),
-(104, 'info', 'Personnel ID 3 deleted', '2025-09-09 07:02:45'),
-(105, 'info', 'Total payments for personnel ID 4: 12000', '2025-09-09 07:02:45'),
-(106, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:02:45'),
-(107, 'info', 'Personnel ID 4 deleted', '2025-09-09 07:02:48'),
-(108, 'info', 'Fetched 0 personnel, 0 payments, 0 assets, and 0 leaves', '2025-09-09 07:02:48'),
-(109, 'info', 'Personnel İSMAİL SEVİNÇ added with email: ismailsevinc@sabl.com.tr', '2025-09-09 07:03:53'),
-(110, 'info', 'Total payments for personnel ID 5: 28000', '2025-09-09 07:03:53'),
-(111, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:03:53'),
-(112, 'info', 'Total payments for personnel ID 5: 28000', '2025-09-09 07:03:56'),
-(113, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:03:56'),
-(114, 'info', 'Payment advance of 7000 TRY for personnel ID 5', '2025-09-09 07:04:22'),
-(115, 'info', 'Total payments for personnel ID 5: 35000', '2025-09-09 07:04:22'),
-(116, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:04:22'),
-(117, 'error', 'Geçersiz CSRF token (personnel), Sent: 9bec2d8c0ac0c2e19e274896aa6f1fbfeaa422559b271e7128437f27745e2894, Expected: db39622942b9c043d6a9713c7e8c0f797779aabc8bb1cbb5f7f7a2e0b17414bf', '2025-09-09 07:45:22'),
-(118, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"9bec2d8c0ac0c2e19e274896aa6f1fbfeaa422559b271e7128437f27745e2894\",\"type\":\"add_payment\",\"personnel_id\":\"5\",\"payment_type\":\"advance\",\"amount\":\"7000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-07\",\"currency\":\"TRY\",\"description\":\"\"}', '2025-09-09 07:45:22'),
-(119, 'error', 'Geçersiz CSRF token (personnel), Sent: 9bec2d8c0ac0c2e19e274896aa6f1fbfeaa422559b271e7128437f27745e2894, Expected: db39622942b9c043d6a9713c7e8c0f797779aabc8bb1cbb5f7f7a2e0b17414bf', '2025-09-09 07:50:50'),
-(120, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"9bec2d8c0ac0c2e19e274896aa6f1fbfeaa422559b271e7128437f27745e2894\",\"type\":\"add_payment\",\"personnel_id\":\"5\",\"payment_type\":\"advance\",\"amount\":\"7000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-07\",\"currency\":\"TRY\",\"description\":\"\"}', '2025-09-09 07:50:50'),
-(121, 'info', 'Total payments for personnel ID 5: 35000', '2025-09-09 07:50:50'),
-(122, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:50:50'),
-(123, 'info', 'Total payments for personnel ID 5: 35000', '2025-09-09 07:50:52'),
-(124, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:50:52'),
-(125, 'info', 'Leave added for personnel ID 5 from 2025-09-08 to 2025-09-08', '2025-09-09 07:51:04'),
-(126, 'info', 'Total payments for personnel ID 5: 35000', '2025-09-09 07:51:04'),
-(127, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 1 leaves', '2025-09-09 07:51:04'),
-(128, 'info', 'Total payments for personnel ID 5: 28000', '2025-09-09 07:55:20'),
-(129, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 07:55:20'),
-(130, 'info', 'Payment salary of 7000 TRY for personnel ID 5', '2025-09-09 07:55:34'),
-(131, 'info', 'Total payments for personnel ID 5: 7000', '2025-09-09 07:55:34'),
-(132, 'info', 'Fetched 1 personnel, 2 payments, 0 assets, and 0 leaves', '2025-09-09 07:55:34'),
-(133, 'info', 'Leave added for personnel ID 5 from 2025-09-08 to 2025-09-08', '2025-09-09 07:56:43'),
-(134, 'info', 'Total payments for personnel ID 5: 7000', '2025-09-09 07:56:43'),
-(135, 'info', 'Fetched 1 personnel, 2 payments, 0 assets, and 1 leaves', '2025-09-09 07:56:43'),
-(136, 'error', 'Geçersiz CSRF token (personnel), Sent: fba0cecdbaf08c22f96571b7a4bec75e3e687538ddabcc41f092667006feef06, Expected: 7777e4341af9a60444ef2158b5cd936fcfe8f49eb0d355dc6db6ab398ae1c3df', '2025-09-09 08:21:22'),
-(137, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"fba0cecdbaf08c22f96571b7a4bec75e3e687538ddabcc41f092667006feef06\",\"type\":\"add_leave\",\"personnel_id\":\"5\",\"start_date\":\"2025-09-08\",\"end_date\":\"2025-09-08\",\"reason\":\"\"}', '2025-09-09 08:21:22'),
-(138, 'info', 'Remaining balance for personnel ID 5: 7000', '2025-09-09 08:21:22'),
-(139, 'info', 'Fetched 1 personnel, 2 payments, 0 assets, and 0 leaves', '2025-09-09 08:21:22'),
-(140, 'info', 'Remaining balance for personnel ID 5: 7000', '2025-09-09 08:21:25'),
-(141, 'info', 'Fetched 1 personnel, 2 payments, 0 assets, and 0 leaves', '2025-09-09 08:21:25'),
-(142, 'info', 'Fetched 0 personnel, 0 payments, 0 assets, and 0 leaves', '2025-09-09 08:21:43'),
-(143, 'info', 'Personnel İSMAİL SEVİNÇ added with email: ismailsevinc@sabl.com.tr', '2025-09-09 08:22:19'),
-(144, 'info', 'Remaining balance for personnel ID 6: 28000', '2025-09-09 08:22:19'),
-(145, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 08:22:19'),
-(146, 'info', 'Payment advance of 6000 TRY for personnel ID 6', '2025-09-09 08:23:26'),
-(147, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:23:26'),
-(148, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 0 leaves', '2025-09-09 08:23:26'),
-(149, 'info', 'Leave added for personnel ID 6 from 2025-09-03 to 2025-09-03', '2025-09-09 08:23:41'),
-(150, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:23:41'),
-(151, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 1 leaves', '2025-09-09 08:23:41'),
-(152, 'info', 'Leave added for personnel ID 6 from 2025-09-08 to 2025-09-08', '2025-09-09 08:23:52'),
-(153, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:23:52'),
-(154, 'info', 'Fetched 1 personnel, 1 payments, 0 assets, and 2 leaves', '2025-09-09 08:23:52'),
-(155, 'info', 'Personnel BULUT BENEK added with email: bulutbenek@sabl.com.tr', '2025-09-09 08:25:07'),
-(156, 'info', 'Remaining balance for personnel ID 7: 28000', '2025-09-09 08:25:07'),
-(157, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:25:07'),
-(158, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, and 2 leaves', '2025-09-09 08:25:07'),
-(159, 'info', 'Payment advance of 7000 TRY for personnel ID 7', '2025-09-09 08:25:28'),
-(160, 'info', 'Remaining balance for personnel ID 7: 21000', '2025-09-09 08:25:28'),
-(161, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:25:28'),
-(162, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, and 2 leaves', '2025-09-09 08:25:28'),
-(163, 'error', 'Geçersiz CSRF token (personnel), Sent: e955aa1193bef621e024e9f56bb97b1f9588bc8f89b0161035f12b9db0d95da4, Expected: d0f3148196e5a4b5b9d0809ddd0d3878f74be66ad33ca057ca55b8c6b2915346', '2025-09-09 08:33:47'),
-(164, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"e955aa1193bef621e024e9f56bb97b1f9588bc8f89b0161035f12b9db0d95da4\",\"type\":\"add_payment\",\"personnel_id\":\"7\",\"payment_type\":\"advance\",\"amount\":\"7000\",\"account_id\":\"13\",\"payment_date\":\"2025-09-07\",\"currency\":\"TRY\",\"description\":\"\"}', '2025-09-09 08:33:47'),
-(165, 'info', 'Remaining balance for personnel ID 7: 21000', '2025-09-09 08:33:47'),
-(166, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:33:47'),
-(167, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, 2 leaves, 0 overtime records', '2025-09-09 08:33:47'),
-(168, 'info', 'Overtime added for personnel ID 7: 14.983333333333 hours, earning 1748.0555555556 TRY', '2025-09-09 08:34:09'),
-(169, 'info', 'Remaining balance for personnel ID 7: 21000', '2025-09-09 08:34:09'),
-(170, 'info', 'Remaining balance for personnel ID 6: 22000', '2025-09-09 08:34:09'),
-(171, 'info', 'Fetched 2 personnel, 2 payments, 0 assets, 2 leaves, 1 overtime records', '2025-09-09 08:34:09'),
-(172, 'error', 'Invalid CSRF token: Sent: d0f3148196e5a4b5b9d0809ddd0d3878f74be66ad33ca057ca55b8c6b2915346, Expected: 9b16707267e1614575f46d1735c23bc488c66b3697ffa1bec9f689ac6b22b829', '2025-09-09 09:37:04'),
-(173, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"d0f3148196e5a4b5b9d0809ddd0d3878f74be66ad33ca057ca55b8c6b2915346\",\"type\":\"add_overtime\",\"personnel_id\":\"7\",\"work_date\":\"2025-09-08\",\"start_time\":\"09:00\",\"end_time\":\"23:59\",\"description\":\"\"}', '2025-09-09 09:37:04'),
-(174, 'error', 'Invalid CSRF token: Sent: d0f3148196e5a4b5b9d0809ddd0d3878f74be66ad33ca057ca55b8c6b2915346, Expected: 9b16707267e1614575f46d1735c23bc488c66b3697ffa1bec9f689ac6b22b829', '2025-09-09 09:39:35'),
-(175, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"d0f3148196e5a4b5b9d0809ddd0d3878f74be66ad33ca057ca55b8c6b2915346\",\"type\":\"add_overtime\",\"personnel_id\":\"7\",\"work_date\":\"2025-09-08\",\"start_time\":\"09:00\",\"end_time\":\"23:59\",\"description\":\"\"}', '2025-09-09 09:39:35'),
-(176, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-09 11:09:07'),
-(177, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-09 11:09:08'),
-(178, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-09 11:17:40'),
-(179, 'error', 'Hata: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'WHERE issue_date BETWEEN \'2025-09-01\' AND \'2025-09-07\' ORDER BY issue_date DESC\' at line 1, POST: {\"csrf_token\":\"9b16707267e1614575f46d1735c23bc488c66b3697ffa1bec9f689ac6b22b829\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"7\",\"period\":\"weekly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-07\"}', '2025-09-09 13:15:29'),
-(180, 'error', 'Hata: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'WHERE issue_date BETWEEN \'2025-09-01\' AND \'2025-09-07\' ORDER BY issue_date DESC\' at line 1, POST: {\"csrf_token\":\"e1884a2c352e4c8b7d8cede638a69f3729a362df3e7be1bb2d89887da006bb65\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"6\",\"period\":\"weekly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-07\"}', '2025-09-09 13:15:41'),
-(181, 'error', 'Invalid CSRF token: Sent: e1884a2c352e4c8b7d8cede638a69f3729a362df3e7be1bb2d89887da006bb65, Expected: dec4fb2ac1e7acef7150b6b90ffd8ef396d9e4c58cb64f428d95ab816e205bee', '2025-09-09 13:17:03'),
-(182, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"e1884a2c352e4c8b7d8cede638a69f3729a362df3e7be1bb2d89887da006bb65\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"6\",\"period\":\"weekly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-07\"}', '2025-09-09 13:17:03'),
-(183, 'info', 'Personnel test added with email: test@test.com', '2025-09-09 13:17:55'),
-(184, 'info', 'Personnel ID 8 deleted', '2025-09-09 13:18:02'),
-(185, 'error', 'Hata: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'WHERE issue_date BETWEEN \'2025-09-01\' AND \'2025-09-30\' ORDER BY issue_date DESC\' at line 1, POST: {\"csrf_token\":\"8a6db0fa69bff74535047418b7b7a52553444532c9407501f15d3504ca0e0ed4\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"7\",\"period\":\"monthly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-30\"}', '2025-09-09 13:18:26'),
-(186, 'error', 'Invalid CSRF token: Sent: 8a6db0fa69bff74535047418b7b7a52553444532c9407501f15d3504ca0e0ed4, Expected: 97715198a7daf32ebe16a049a78541509ac54bd3d0eba631f491d63ec20bf12c', '2025-09-09 13:20:36'),
-(187, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"8a6db0fa69bff74535047418b7b7a52553444532c9407501f15d3504ca0e0ed4\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"7\",\"period\":\"monthly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-30\"}', '2025-09-09 13:20:36'),
-(188, 'error', 'Invalid CSRF token: Sent: 97715198a7daf32ebe16a049a78541509ac54bd3d0eba631f491d63ec20bf12c, Expected: dbae9556abb48c44ae1f0d4921eb7ab6ffb2284a5a4b2afa71a80fdbaff570e7', '2025-09-09 13:21:28'),
-(189, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"97715198a7daf32ebe16a049a78541509ac54bd3d0eba631f491d63ec20bf12c\",\"type\":\"export_pdf\",\"export_type\":\"details\",\"personnel_id\":\"6\",\"period\":\"weekly\",\"start_date\":\"2025-09-01\",\"end_date\":\"2025-09-07\"}', '2025-09-09 13:21:28'),
-(190, 'info', 'Fetched 3 documents', '2025-09-09 13:23:10'),
-(191, 'info', 'Fetched 3 documents', '2025-09-09 13:35:16'),
-(192, 'info', 'Fetched 3 documents', '2025-09-09 14:14:42'),
-(193, 'info', 'Fetched 3 documents', '2025-09-09 15:38:29'),
-(194, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-09 15:38:42'),
-(195, 'info', 'get_invoices.php: 8 için 1 fatura döndürüldü', '2025-09-09 15:38:46'),
-(196, 'info', 'Fetched 1 suppliers and 3 cash accounts', '2025-09-09 15:40:37'),
-(197, 'info', 'Fetched 3 documents', '2025-09-09 20:26:03');
+(1, 'info', 'Fetched 0 suppliers and 0 cash accounts', '2025-09-09 20:42:24'),
+(2, 'info', 'Fetched 0 suppliers and 0 cash accounts', '2025-09-09 20:55:52'),
+(3, 'info', 'Tedarikçi KEMAL ATEŞ eklendi (Bakiye: 5325.5 TRY).', '2025-09-09 20:58:05'),
+(4, 'error', 'Tedarikçi ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"b9031092a671a735febdbc0a563756b9ca7006cabf0bf258115beda740327418\",\"add_supplier\":\"1\",\"name\":\"KEMAL ATE\\u015e\",\"balance\":\"5325.50\",\"currency\":\"TRY\",\"contact_name\":\"KEMAL ATE\\u015e\",\"email\":\"alaskan_17@hotmail.com\",\"phone\":\"00000000000\",\"city\":\"\\u00c7ANAKKALE\",\"district\":\"ECEABAT\"}', '2025-09-09 20:59:17'),
+(5, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 20:59:17'),
+(6, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 20:59:21'),
+(7, 'info', 'get_invoices.php: 1 için 0 fatura döndürüldü', '2025-09-09 20:59:31'),
+(8, 'info', 'Fatura #M012025000002230 tedarikçi ID 1 için eklendi.', '2025-09-09 21:00:13'),
+(9, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 21:00:13'),
+(10, 'info', 'get_invoices.php: 1 için 1 fatura döndürüldü', '2025-09-09 21:00:23'),
+(11, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 21:01:25'),
+(12, 'info', 'Fatura #M012025000002230 tedarikçi ID 1 için eklendi.', '2025-09-09 21:01:46'),
+(13, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 21:01:46'),
+(14, 'info', 'get_invoices.php: 1 için 1 fatura döndürüldü', '2025-09-09 21:01:50'),
+(15, 'info', 'Tedarikçi ID 1 güncellendi: KEMAL ATEŞ (Bakiye: 10602.5 TRY).', '2025-09-09 21:02:05'),
+(16, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 21:02:06'),
+(17, 'info', 'Fetched 1 suppliers and 0 cash accounts', '2025-09-09 21:02:26'),
+(18, 'info', 'Tedarikçi REİS GIDA eklendi (Bakiye: 20245 TRY).', '2025-09-09 21:03:21'),
+(19, 'info', 'Fetched 2 suppliers and 0 cash accounts', '2025-09-09 21:03:23'),
+(20, 'info', 'Fetched 2 suppliers and 0 cash accounts', '2025-09-09 21:03:24'),
+(21, 'info', 'Fatura #2 tedarikçi ID 1 için eklendi.', '2025-09-09 21:03:42'),
+(22, 'info', 'Fetched 2 suppliers and 0 cash accounts', '2025-09-09 21:03:42'),
+(23, 'info', 'Fetched 2 suppliers and 0 cash accounts', '2025-09-09 21:03:44'),
+(24, 'info', 'get_invoices.php: 1 için 2 fatura döndürüldü', '2025-09-09 21:03:45'),
+(25, 'info', 'Fetched 0 active credits, 0 installments, and 0 payment history records', '2025-09-09 21:04:36'),
+(26, 'transfer', 'From: 3, To: 1, Amount: 7675 TRY, Amount TRY: 7675', '2025-09-09 21:07:14'),
+(27, 'transfer', 'From: 3, To: 1, Amount: 300 TRY, Amount TRY: 300', '2025-09-09 21:10:17'),
+(28, 'info', 'Personnel KADİR BEHRAMLI added with email: test@test.com', '2025-09-09 21:59:49'),
+(29, 'error', 'Hata: Bu e-posta zaten kayıtlı., POST: {\"csrf_token\":\"5b8db36c359b198af1f92387ce917fd4267460dbf559e357211132013751f6da\",\"type\":\"add_personnel\",\"name\":\"\\u0130SMA\\u0130L SEV\\u0130N\\u00c7\",\"position\":\"GARSON\",\"salary\":\"28000\",\"email\":\"test@test.com\",\"phone\":\"00000000000\"}', '2025-09-09 22:01:14'),
+(30, 'error', 'Invalid CSRF token: Sent: 5b8db36c359b198af1f92387ce917fd4267460dbf559e357211132013751f6da, Expected: 8040cd443ba600a048121daf9c1e49b05a15f1cf01bb4dc4741546ff775874de', '2025-09-09 22:01:17'),
+(31, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"5b8db36c359b198af1f92387ce917fd4267460dbf559e357211132013751f6da\",\"type\":\"add_personnel\",\"name\":\"\\u0130SMA\\u0130L SEV\\u0130N\\u00c7\",\"position\":\"GARSON\",\"salary\":\"28000\",\"email\":\"test@test.com\",\"phone\":\"00000000000\"}', '2025-09-09 22:01:17'),
+(32, 'error', 'Hata: Bu e-posta zaten kayıtlı., POST: {\"csrf_token\":\"8040cd443ba600a048121daf9c1e49b05a15f1cf01bb4dc4741546ff775874de\",\"type\":\"add_personnel\",\"name\":\"\\u0130SMA\\u0130L SEV\\u0130N\\u00c7\",\"position\":\"GARSON\",\"salary\":\"28000\",\"email\":\"test@test.com\",\"phone\":\"00000000000\"}', '2025-09-09 22:01:55'),
+(33, 'info', 'Personnel İSMAİL SEVİNÇ added with email: test@gmail.com', '2025-09-09 22:02:33'),
+(34, 'info', 'Personnel BULUT BENEK added with email: test@sabl.com.tr', '2025-09-09 22:02:50'),
+(35, 'info', 'Personnel ROZELİN added with email: test@test.com.tr', '2025-09-09 22:03:12'),
+(36, 'error', 'Invalid CSRF token: Sent: 3907085f78c0c1664903dfc5b6511e0938b06e42fc0097073aa6bb2314fd98a5, Expected: 87f5b9d643a34ca94ae5890bf2e9718cc4ad58a13d33fc78880c6411b38572f5', '2025-09-09 22:03:12'),
+(37, 'error', 'Hata: Geçersiz CSRF token., POST: {\"csrf_token\":\"3907085f78c0c1664903dfc5b6511e0938b06e42fc0097073aa6bb2314fd98a5\",\"type\":\"add_personnel\",\"name\":\"ROZEL\\u0130N\",\"position\":\"KANO K\\u0130RALAMA\",\"salary\":\"30000\",\"email\":\"test@test.com.tr\",\"phone\":\"00000000000\"}', '2025-09-09 22:03:12'),
+(38, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:15:27'),
+(39, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:15:27'),
+(40, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:17:05'),
+(41, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:17:05'),
+(42, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:17:14'),
+(43, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-10\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:17:14'),
+(44, 'error', 'Geçersiz CSRF token (credits), Sent: none, Expected: ', '2025-09-10 17:18:40'),
+(45, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:18:40'),
+(46, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:19:00'),
+(47, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:19:00'),
+(48, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:19:11'),
+(49, 'error', 'Hata: Geçersiz CSRF token., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:19:11'),
+(50, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:36:55'),
+(51, 'error', 'Hata: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:36:55'),
+(52, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:37:06'),
+(53, 'error', 'Hata: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:37:06'),
+(54, 'error', 'Invalid CSRF token: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b', '2025-09-10 17:38:58'),
+(55, 'error', 'Hata: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:38:58'),
+(56, 'error', 'Invalid CSRF token at 2025-09-10 17:47:52: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b, POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:47:52'),
+(57, 'error', 'Hata at 2025-09-10 17:47:52: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:47:52'),
+(58, 'error', 'Invalid CSRF token at 2025-09-10 17:48:03: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b, POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:48:03'),
+(59, 'error', 'Hata at 2025-09-10 17:48:03: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:48:03'),
+(60, 'error', 'Invalid CSRF token at 2025-09-10 17:48:52: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b, POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:48:52'),
+(61, 'error', 'Hata at 2025-09-10 17:48:52: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 17:48:52'),
+(62, 'error', 'Invalid CSRF token at 2025-09-10 18:01:55: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b, POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 18:01:55'),
+(63, 'error', 'Hata at 2025-09-10 18:01:55: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-10 18:01:55'),
+(64, 'error', 'Invalid CSRF token at 2025-09-11 05:26:41: Sent: none, Expected: a34487b5920c8df8563dde80ad01d7f1c1151c59c9f11920dc44beac94a7154b, POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:26:41'),
+(65, 'error', 'Hata at 2025-09-11 05:26:41: Geçersiz CSRF token. Lütfen sayfayı yenileyin ve tekrar deneyin., POST: {\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:26:41'),
+(66, 'error', 'Undefined type in POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:46:22'),
+(67, 'error', 'Hata at 2025-09-11 05:46:22: Geçersiz işlem tipi. Lütfen tekrar deneyin., POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:46:22'),
+(68, 'error', 'Undefined type in POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:48:52'),
+(69, 'error', 'Hata at 2025-09-11 05:48:52: Geçersiz işlem tipi. Lütfen tekrar deneyin., POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:48:52'),
+(70, 'error', 'Undefined type in POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:53:50'),
+(71, 'error', 'Hata at 2025-09-11 05:53:50: Geçersiz işlem tipi. Lütfen tekrar deneyin., POST: {\"csrf_token\":\"231515b9d17c26e3e9d68d01c8144584886d33159f3c6fc7505797eddc6df3a1\",\"personnel_id\":\"1\",\"account_id\":\"1\",\"payment_type\":\"salary\",\"amount\":\"2800\",\"currency\":\"TRY\",\"payment_date\":\"2025-09-03\",\"description\":\"\",\"add_payment\":\"\"}', '2025-09-11 05:53:50'),
+(72, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:19:50'),
+(73, 'info', 'get_invoices.php: 2 için 0 fatura döndürüldü', '2025-09-11 09:20:07'),
+(74, 'info', 'Fatura #1 tedarikçi ID 2 için eklendi.', '2025-09-11 09:20:29'),
+(75, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:20:29'),
+(76, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:20:36'),
+(77, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:20:36'),
+(78, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"12265120b7211cac0a1cb5a61757ac7000819c4a7840479a48f09535cd97e518\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:20:47'),
+(79, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:20:47'),
+(80, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:21:13'),
+(81, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:21:16'),
+(82, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:21:16'),
+(83, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"676657d80b7ea8af5c5a076b48dbe7730ccc6e1f547d85d1a215a7bacab44492\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:21:34'),
+(84, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:21:34'),
+(85, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"676657d80b7ea8af5c5a076b48dbe7730ccc6e1f547d85d1a215a7bacab44492\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:28:17'),
+(86, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:28:17'),
+(87, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:28:19'),
+(88, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:31:15'),
+(89, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:31:17'),
+(90, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"0dbd462bc628bf950149ea0423916682f8f2cf0bc499b6c848b0911e6ccdc2a6\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:31:25'),
+(91, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:31:25'),
+(92, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"0dbd462bc628bf950149ea0423916682f8f2cf0bc499b6c848b0911e6ccdc2a6\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:32:39'),
+(93, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:32:39'),
+(94, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:32:41'),
+(95, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:32:42'),
+(96, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"c8b261b81abe5637446a96f3d6c3a751aaedb6cff41cd1470b34a8a1726249ca\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:32:50'),
+(97, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:32:50'),
+(98, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:35:51'),
+(99, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:35:54'),
+(100, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"5204dd1cdd6c055d8b946b1b0617c36b9ad09cd492e1f2325ace679ba359a3bf\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:36:03'),
+(101, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:36:03'),
+(102, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"5204dd1cdd6c055d8b946b1b0617c36b9ad09cd492e1f2325ace679ba359a3bf\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:36:52'),
+(103, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:36:52'),
+(104, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:36:53'),
+(105, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:36:55'),
+(106, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"7e21e75633eedb3abc0f96a4f5d5d81c6c369e7c8e0f784807565a692b48997d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:37:03'),
+(107, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:37:03'),
+(108, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"7e21e75633eedb3abc0f96a4f5d5d81c6c369e7c8e0f784807565a692b48997d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:38:46'),
+(109, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:38:46'),
+(110, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:38:46'),
+(111, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:38:49'),
+(112, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:38:58'),
+(113, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:39:01'),
+(114, 'info', 'get_invoices.php: 2 için 1 fatura döndürüldü', '2025-09-11 09:39:02'),
+(115, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"adce878b06a9436e3b3f989dc15c7fffcc8afa262881bec3de61a18a8795c9f7\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 09:39:10'),
+(116, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 09:39:10'),
+(117, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"adce878b06a9436e3b3f989dc15c7fffcc8afa262881bec3de61a18a8795c9f7\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:00:41'),
+(118, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:00:41'),
+(119, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:00:42'),
+(120, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"961b373d75d2b62bb4360d3814ad82a7e19d7af93e5b9b41c9204791efaf47bd\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:00:59'),
+(121, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:00:59'),
+(122, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:06:39'),
+(123, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:06:39'),
+(124, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"c5e84def9a6c265adcbd4304d007e5430e394ddfdd21db0493f912b61eeacb80\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:06:51'),
+(125, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:06:51'),
+(126, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:08:31'),
+(127, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"443c9ee10e4ab6ea3f7bcac2fe9a9410e35efc83ae17603f0eb131c7a2d6ae1d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:08:41'),
+(128, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:08:41'),
+(129, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"443c9ee10e4ab6ea3f7bcac2fe9a9410e35efc83ae17603f0eb131c7a2d6ae1d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:09:10'),
+(130, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:09:10'),
+(131, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:09:11'),
+(132, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"12b15b75d6123638b5f6a86eef4fe5703bf6579e1473af1dd79c6db4225ae619\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:09:20'),
+(133, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:09:20'),
+(134, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:15:10'),
+(135, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"3ed3ecde907cf6910c97b5ba341c77b6f38b37b8cb9d16f744fd0f8a94364d74\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:15:19'),
+(136, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:15:19'),
+(137, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"3ed3ecde907cf6910c97b5ba341c77b6f38b37b8cb9d16f744fd0f8a94364d74\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:17:00'),
+(138, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:00'),
+(139, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:02'),
+(140, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"dda8083dc9e619f5302313c8e1bcbfc0672c5039cf57e08b1962a99e5fb9049f\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:17:10'),
+(141, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:10'),
+(142, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"dda8083dc9e619f5302313c8e1bcbfc0672c5039cf57e08b1962a99e5fb9049f\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:17:36'),
+(143, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:36'),
+(144, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:37'),
+(145, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"8ee5219605c65ad10770c903bfdaceeca8743f9e782488164dba1905b4cb0c0c\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:17:46'),
+(146, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:17:46'),
+(147, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:25:35'),
+(148, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:28:23'),
+(149, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"e47395e301d4d11b219b2c99d0f8a42032d1cc71ba41afcb861387815b35732d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:28:33'),
+(150, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:28:33'),
+(151, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"e47395e301d4d11b219b2c99d0f8a42032d1cc71ba41afcb861387815b35732d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:31:35'),
+(152, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:31:35'),
+(153, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:31:36'),
+(154, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:31:48'),
+(155, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"3da0dd00a9ba29c5021f0961aecf757553650f7b86aea6a78d5e946b69b45cb9\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 10:32:00'),
+(156, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:32:00'),
+(157, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 10:33:19'),
+(158, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:03:27'),
+(159, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:03:28'),
+(160, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"62d250e286d3bd850695bfb3bc9295c603fc81275a959127c59d10e6f8587fed\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 11:03:37'),
+(161, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:03:37'),
+(162, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"62d250e286d3bd850695bfb3bc9295c603fc81275a959127c59d10e6f8587fed\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 11:19:18'),
+(163, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:19:18'),
+(164, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:19:19'),
+(165, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"1e6f41f475d81f794d0e4da16414bc29f1307556b903530d853fd648e58228a6\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 11:19:28'),
+(166, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 11:19:28'),
+(167, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:43:48'),
+(168, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"a546b6c8423d956966b4bb2357eaf59b0e017b8faa1d4726c14457d02692b16d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 12:43:57'),
+(169, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:43:57'),
+(170, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"a546b6c8423d956966b4bb2357eaf59b0e017b8faa1d4726c14457d02692b16d\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 12:44:25'),
+(171, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:44:25'),
+(172, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:44:43'),
+(173, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"37ea093cc853c42db6fc423a6d03f5479e897e2e791863e4706dbd6fc036912a\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 12:44:54'),
+(174, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:44:54'),
+(175, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:49:04'),
+(176, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:49:31'),
+(177, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:49:32'),
+(178, 'error', 'Ödeme ekleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'total_amount\' in \'field list\', POST: {\"csrf_token\":\"3f089967786ec6bbf6d691431de44d5195ab4d1f5b24b9da62ead7cb2b2e4449\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 12:49:40'),
+(179, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 12:49:40'),
+(180, 'error', 'Ödeme ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"3f089967786ec6bbf6d691431de44d5195ab4d1f5b24b9da62ead7cb2b2e4449\",\"supplier_id\":\"2\",\"add_payment\":\"1\",\"payment_type\":\"balance\",\"invoice_id\":\"\",\"amount\":\"7000\",\"account_id\":\"1\",\"payment_date\":\"2025-09-07\"}', '2025-09-11 13:04:24'),
+(181, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 13:04:24'),
+(182, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 13:04:26'),
+(183, 'info', 'Ödeme balance of 7000 TRY for supplier ID 2', '2025-09-11 13:04:35'),
+(184, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 13:04:35'),
+(185, 'info', 'Fetched 2 suppliers and 5 cash accounts', '2025-09-11 13:26:09'),
+(186, 'info', 'Tedarikçi GAZETECİ eklendi (Bakiye: 560 TRY).', '2025-09-11 13:26:49'),
+(187, 'error', 'Tedarikçi ekleme hatası: Geçersiz CSRF token., POST: {\"csrf_token\":\"e4393a0559ef52660f0febb8e0748ef02a798d6aede2209bae9316eb3f98e97d\",\"add_supplier\":\"1\",\"name\":\"GAZETEC\\u0130\",\"balance\":\"560\",\"currency\":\"TRY\",\"contact_name\":\"CAH\\u0130T\",\"email\":\"gazete@test.com\",\"phone\":\"00000000000\",\"city\":\"\\u00c7ANAKKALE\",\"district\":\"ECEABAT\"}', '2025-09-11 13:26:52'),
+(188, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 13:26:52'),
+(189, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 13:26:54'),
+(190, 'info', 'Ödeme balance of 560 TRY for supplier ID 3', '2025-09-11 13:27:07'),
+(191, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 13:27:07'),
+(192, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 13:47:58'),
+(193, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:31:04'),
+(194, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:31:50'),
+(195, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:31:52'),
+(196, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:32:10'),
+(197, 'info', 'Fatura #1 tedarikçi ID 2 için eklendi.', '2025-09-11 14:32:23'),
+(198, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:32:23'),
+(199, 'info', 'Ödeme balance of 7000 TRY for supplier ID 2', '2025-09-11 14:32:35'),
+(200, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:32:35'),
+(201, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:42:15'),
+(202, 'info', 'Fatura #1 tedarikçi ID 3 için eklendi.', '2025-09-11 14:43:03'),
+(203, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:43:03'),
+(204, 'info', 'Ödeme balance of 560 TRY for supplier ID 3', '2025-09-11 14:43:56'),
+(205, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 14:43:56'),
+(206, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:07:14'),
+(207, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:08:20'),
+(208, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:10:09'),
+(209, 'info', 'Fatura #1 tedarikçi ID 3 için eklendi.', '2025-09-11 15:10:28'),
+(210, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:10:28'),
+(211, 'info', 'Ödeme balance of 560 TRY for supplier ID 3', '2025-09-11 15:10:46'),
+(212, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:10:46'),
+(213, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:34:25'),
+(214, 'info', 'Fatura #1 tedarikçi ID 2 için eklendi.', '2025-09-11 15:34:53'),
+(215, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:34:53'),
+(216, 'info', 'Ödeme balance of 7000 TRY for supplier ID 2', '2025-09-11 15:35:03'),
+(217, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:35:03'),
+(218, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:36:42'),
+(219, 'info', 'Fatura #2 tedarikçi ID 3 için eklendi.', '2025-09-11 15:36:55'),
+(220, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:36:55'),
+(221, 'info', 'Ödeme balance of 560 TRY for supplier ID 3', '2025-09-11 15:37:07'),
+(222, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:37:07'),
+(223, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:44:20'),
+(224, 'info', 'Fatura #M012025000002230 tedarikçi ID 1 için eklendi.', '2025-09-11 15:45:06'),
+(225, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:45:06'),
+(226, 'info', 'Ödeme balance of 5000 TRY for supplier ID 1', '2025-09-11 15:45:19'),
+(227, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 15:45:19'),
+(228, 'error', 'Bakiye güncelleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'due_date\' in \'field list\', POST: {\"csrf_token\":\"818acc44acdc4fedec509b6860f6434a4a8412a5afc48a69172f29b74b535773\",\"customer_id\":\"1\",\"update_balance\":\"1\",\"type\":\"debit\",\"amount\":\"2370\",\"description\":\"DEV\\u0130R\"}', '2025-09-11 17:56:31'),
+(229, 'error', 'Bakiye güncelleme hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'due_date\' in \'field list\', POST: {\"csrf_token\":\"c73332e01e62a48fce41bd545d7c9324833ce8fe5b388026ceeb616609da50f2\",\"customer_id\":\"2\",\"update_balance\":\"1\",\"type\":\"credit\",\"amount\":\"2135\",\"description\":\"\"}', '2025-09-11 19:19:26'),
+(230, 'info', 'Fetched 0 active credits, 0 installments, and 0 payment history records', '2025-09-11 19:38:01'),
+(231, 'info', 'Fetched 0 active credits, 0 installments, and 0 payment history records', '2025-09-11 19:42:14'),
+(232, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-11 21:39:29'),
+(233, 'info', 'Fetched 0 active credits, 0 installments, and 0 payment history records', '2025-09-12 06:44:08'),
+(234, 'info', 'Fetched 0 documents', '2025-09-12 09:00:30'),
+(235, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 12:22:45'),
+(236, 'info', 'Fatura #M012025000002293 tedarikçi ID 1 için eklendi.', '2025-09-12 12:23:22'),
+(237, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 12:23:22'),
+(238, 'info', 'Fetched 0 documents', '2025-09-12 12:36:58'),
+(239, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:27:01'),
+(240, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:45:37'),
+(241, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:46:57'),
+(242, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:47:43'),
+(243, 'info', 'Fatura #m012025000002293 tedarikçi ID 1 için eklendi.', '2025-09-12 13:48:20'),
+(244, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:48:20'),
+(245, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:48:40'),
+(246, 'info', 'Fetched 3 suppliers and 5 cash accounts', '2025-09-12 13:52:26'),
+(247, 'info', 'Fetched 0 documents', '2025-09-12 16:13:25'),
+(248, 'info', 'Fetched 0 documents', '2025-09-12 16:13:28'),
+(249, 'info', 'Fetched 0 documents', '2025-09-12 16:13:29'),
+(250, 'info', 'Fetched 0 documents', '2025-09-12 16:13:39'),
+(251, 'error', 'Arama hatası: SQLSTATE[42S22]: Column not found: 1054 Unknown column \'quantity\' in \'field list\', POST: {\"csrf_token\":\"5362fdbca644bf93004332569f491f772f2e1f685787a556ffcf8b13b3f63546\",\"search_query\":\"test\",\"search_assets\":\"\"}', '2025-09-12 21:16:36'),
+(252, 'info', 'Fetched 3 suppliers and 0 cash accounts', '2025-09-12 21:16:42');
 
 -- --------------------------------------------------------
 
@@ -824,31 +779,39 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `priority` enum('low','medium','high') NOT NULL DEFAULT 'medium',
   PRIMARY KEY (`id`),
   KEY `idx_notifications_user_id` (`user_id`,`created_at`,`is_read`,`is_archived`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `notifications`
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `is_read`, `created_at`, `is_archived`, `priority`) VALUES
-(1, 1, 'stock', 'Ürün #123 stok seviyesi kritik (5 adet kaldı).', 0, '2025-09-06 16:52:31', 0, 'medium'),
-(2, 1, 'chat', 'Ayşe Demir’den yeni mesaj: \"Sipariş durumu nedir?\"', 0, '2025-09-06 16:52:31', 0, 'medium'),
-(3, 1, 'other', 'Sistem güncellemesi: Yeni özellikler eklendi.', 0, '2025-09-06 16:52:31', 0, 'medium'),
-(4, 1, 'other', 'Test bildirimi: Sistem güncellendi.', 0, '2025-09-07 08:14:49', 0, 'medium'),
-(5, 1, 'stock', 'Ürün #123 stok seviyesi kritik.', 0, '2025-09-07 08:14:49', 0, 'medium'),
-(6, 1, 'chat', 'Yeni mesaj from Kate: test', 0, '2025-09-08 07:26:30', 0, 'medium'),
-(7, 1, 'chat', 'Yeni mesaj from Kate: göt', 0, '2025-09-08 07:26:37', 0, 'medium'),
-(8, 4, 'chat', 'Yeni mesaj from Kate: merhaba', 0, '2025-09-08 07:29:54', 0, 'medium'),
-(9, 1, 'chat', 'Yeni mesaj from Kate: zd', 0, '2025-09-08 08:40:16', 0, 'medium'),
-(10, 1, 'chat', 'Yeni mesaj from Kate: d', 0, '2025-09-08 08:40:19', 0, 'medium'),
-(11, 1, 'chat', 'Yeni mesaj from Kate: m', 0, '2025-09-08 08:40:23', 0, 'medium'),
-(12, 1, 'chat', 'Yeni mesaj from Kate: test', 0, '2025-09-08 08:47:14', 0, 'medium'),
-(13, 1, 'chat', 'Yeni mesaj from Kate: test', 0, '2025-09-08 08:47:15', 0, 'medium'),
-(14, 1, 'chat', 'Yeni mesaj from Kate: tets', 0, '2025-09-08 08:47:16', 0, 'medium'),
-(15, 1, 'chat', 'Yeni mesaj from Kate: test', 0, '2025-09-08 09:26:31', 0, 'medium'),
-(16, 1, 'chat', 'Yeni mesaj from Kate: test', 0, '2025-09-08 17:27:57', 0, 'medium'),
-(17, 2, 'stock', 'Ürün bilgisi güncellendi: 1', 0, '2025-09-08 18:51:19', 0, 'low'),
-(18, 2, 'stock', 'Ürün bilgisi güncellendi: 1', 0, '2025-09-08 18:56:17', 0, 'low');
+(1, 2, '', 'Yeni müşteri eklendi: TOLGA ABİ', 0, '2025-09-11 19:18:17', 0, 'medium'),
+(2, 2, '', 'Yeni kategori eklendi: TEST', 0, '2025-09-11 19:36:22', 0, 'low'),
+(3, 2, '', 'Kategori silindi: ID 15', 0, '2025-09-11 19:36:26', 0, 'low'),
+(4, 2, '', 'Yeni kategori eklendi: TEST', 0, '2025-09-11 19:36:32', 0, 'low'),
+(5, 2, '', 'Kategori güncellendi: TEST', 0, '2025-09-11 19:36:36', 0, 'low'),
+(6, 2, '', 'Kategori silindi: ID 16', 0, '2025-09-11 19:36:40', 0, 'low'),
+(7, 2, '', 'Kilit ekranı açıldı: Kullanıcı ID 2', 0, '2025-09-11 19:55:36', 0, 'low'),
+(8, 2, '', 'Kilit ekranı açıldı: Kullanıcı ID 2', 0, '2025-09-11 19:56:07', 0, 'low'),
+(9, 2, '', 'Kilit ekranı açıldı: Kullanıcı ID 2', 0, '2025-09-11 20:26:32', 0, 'low'),
+(10, 2, '', 'Kullanıcı silindi: ID 4', 0, '2025-09-11 21:16:22', 0, 'low'),
+(11, 2, '', 'Yeni kullanıcı eklendi: test', 0, '2025-09-11 21:16:34', 0, 'low'),
+(12, 1, '', 'Yeni ürün eklendi: SÖZCÜ GAZETESİ', 0, '2025-09-12 08:35:01', 0, 'low'),
+(13, 1, '', 'Yeni ürün eklendi: POSTA GAZETESİ', 0, '2025-09-12 08:45:21', 0, 'low'),
+(14, 1, '', 'Yeni ürün eklendi: AKŞAM GAZETESİ', 0, '2025-09-12 09:00:23', 0, 'low'),
+(15, 1, '', 'Yeni ürün eklendi: U.200 ML CAM FRUTTİ ELMA', 0, '2025-09-12 12:36:34', 0, 'low'),
+(16, 1, '', 'Yeni ürün eklendi: U.200 ML CAM FRUTTİ LİMON', 0, '2025-09-12 12:36:56', 0, 'low'),
+(17, 1, '', 'Fatura içeriği eklendi: Fatura ID 7', 0, '2025-09-12 13:25:19', 0, 'low'),
+(18, 1, '', 'Fatura içeriği eklendi: Fatura ID 9', 0, '2025-09-12 13:25:56', 0, 'low'),
+(19, 1, '', 'Fatura içeriği eklendi: Fatura ID 12', 0, '2025-09-12 13:52:21', 0, 'low'),
+(20, 1, '', 'Yeni depo eklendi: ANA DEPO', 0, '2025-09-12 16:10:39', 0, 'medium'),
+(21, 1, '', 'Yeni depo eklendi: KÜÇÜK DÜKKAN', 0, '2025-09-12 16:11:09', 0, 'medium'),
+(22, 1, '', 'Yeni ürün eklendi: CAN PEPSİ 330ML', 0, '2025-09-12 21:10:14', 0, 'low'),
+(23, 1, '', 'Yeni ürün eklendi: KINIK MADEN SUYU', 0, '2025-09-12 21:10:41', 0, 'low'),
+(24, 1, '', 'Yeni ürün eklendi: BUZDAĞI 0.5LT PET SU', 0, '2025-09-12 21:11:05', 0, 'low'),
+(25, 1, '', 'Yeni ürün eklendi: CAN LİPTON İCE TEA ŞEFTALİ', 0, '2025-09-12 21:11:25', 0, 'low'),
+(26, 1, '', 'Yeni müşteri eklendi: TEST', 0, '2025-09-12 21:18:41', 0, 'medium');
 
 -- --------------------------------------------------------
 
@@ -865,14 +828,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `orders`
---
-
-INSERT INTO `orders` (`id`, `user_id`, `order_date`, `status`, `created_at`) VALUES
-(1, 2, '2025-09-05 15:29:27', 'pending', '2025-09-05 15:29:27');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -890,15 +846,7 @@ CREATE TABLE IF NOT EXISTS `order_details` (
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `order_details`
---
-
-INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `quantity`, `created_at`) VALUES
-(1, 1, 1, 20, '2025-09-05 15:29:27'),
-(2, 1, 2, 20, '2025-09-05 15:29:27');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -920,14 +868,17 @@ CREATE TABLE IF NOT EXISTS `payments` (
   `customer_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `invoice_id` (`invoice_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `payments`
 --
 
 INSERT INTO `payments` (`id`, `supplier_id`, `invoice_id`, `amount`, `payment_type`, `currency`, `payment_date`, `description`, `created_at`, `customer_id`) VALUES
-(1, 1, 2, 5000.00, '', 'TRY', '2025-09-02', '', '2025-09-02 11:58:18', NULL);
+(26, 3, NULL, 560.00, 'balance', '', '2025-09-01', NULL, '2025-09-11 15:10:46', NULL),
+(27, 2, NULL, 7000.00, 'balance', '', '2025-09-07', NULL, '2025-09-11 15:35:03', NULL),
+(28, 3, NULL, 560.00, 'balance', '', '2025-09-08', NULL, '2025-09-11 15:37:07', NULL),
+(29, 1, NULL, 5000.00, 'balance', '', '2025-09-11', NULL, '2025-09-11 15:45:19', NULL);
 
 --
 -- Tetikleyiciler `payments`
@@ -945,13 +896,13 @@ CREATE TRIGGER `after_payment_insert` AFTER INSERT ON `payments` FOR EACH ROW BE
     WHERE p.invoice_id = NEW.invoice_id;
     
     -- Fatura tutarını al
-    SELECT total_amount * (SELECT rate FROM exchange_rates WHERE currency_code = i.currency ORDER BY updated_at DESC LIMIT 1)
+    SELECT amount * (SELECT rate FROM exchange_rates WHERE currency_code = i.currency ORDER BY updated_at DESC LIMIT 1)
     INTO invoice_amount
     FROM invoices i
     WHERE i.id = NEW.invoice_id;
     
     -- Eğer fatura tamamen ödendiyse hatırlatıcıyı kapat
-    IF total_paid >= invoice_amount THEN
+    IF total_paid IS NOT NULL AND invoice_amount IS NOT NULL AND total_paid >= invoice_amount THEN
         UPDATE reminders 
         SET status = 'dismissed'
         WHERE type = 'invoice' AND related_id = NEW.invoice_id;
@@ -976,15 +927,17 @@ CREATE TABLE IF NOT EXISTS `personnel` (
   `phone` varchar(20) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `personnel`
 --
 
 INSERT INTO `personnel` (`id`, `name`, `position`, `salary`, `email`, `phone`, `created_at`) VALUES
-(6, 'İSMAİL SEVİNÇ', 'GARSON', 28000.00, 'ismailsevinc@sabl.com.tr', '05467713730', '2025-09-09 08:22:19'),
-(7, 'BULUT BENEK', 'GARSON', 28000.00, 'bulutbenek@sabl.com.tr', '05518584689', '2025-09-09 08:25:07');
+(1, 'KADİR BEHRAMLI', 'GARSON', 2800.00, 'test@test.com', '00000000000', '2025-09-09 21:59:49'),
+(2, 'İSMAİL SEVİNÇ', 'GARSON', 28000.00, 'test@gmail.com', '00000000000', '2025-09-09 22:02:33'),
+(3, 'BULUT BENEK', 'GARSON', 28000.00, 'test@sabl.com.tr', '00000000000', '2025-09-09 22:02:50'),
+(4, 'ROZELİN', 'KANO KİRALAMA', 0.00, 'test@test.com.tr', '00000000000', '2025-09-09 22:03:12');
 
 -- --------------------------------------------------------
 
@@ -1003,15 +956,7 @@ CREATE TABLE IF NOT EXISTS `personnel_advances` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `personnel_id` (`personnel_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `personnel_advances`
---
-
-INSERT INTO `personnel_advances` (`id`, `personnel_id`, `amount`, `issue_date`, `currency`, `description`, `created_at`) VALUES
-(4, 6, 6000.00, '2025-09-07', 'TRY', NULL, '2025-09-09 08:23:26'),
-(5, 7, 7000.00, '2025-09-07', 'TRY', NULL, '2025-09-09 08:25:28');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1048,15 +993,15 @@ CREATE TABLE IF NOT EXISTS `personnel_leaves` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `personnel_id` (`personnel_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `personnel_leaves`
 --
 
 INSERT INTO `personnel_leaves` (`id`, `personnel_id`, `start_date`, `end_date`, `reason`, `created_at`) VALUES
-(4, 6, '2025-09-03', '2025-09-03', NULL, '2025-09-09 08:23:41'),
-(5, 6, '2025-09-08', '2025-09-08', NULL, '2025-09-09 08:23:52');
+(1, 2, '2025-09-03', '2025-09-03', '', '2025-09-11 09:17:56'),
+(2, 2, '2025-09-08', '2025-09-08', '', '2025-09-11 09:18:05');
 
 -- --------------------------------------------------------
 
@@ -1077,14 +1022,7 @@ CREATE TABLE IF NOT EXISTS `personnel_overtime` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `personnel_id` (`personnel_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `personnel_overtime`
---
-
-INSERT INTO `personnel_overtime` (`id`, `personnel_id`, `work_date`, `start_time`, `end_time`, `hours_worked`, `overtime_earning`, `description`, `created_at`) VALUES
-(1, 7, '2025-09-08', '09:00:00', '23:59:00', 14.98, 1748.06, NULL, '2025-09-09 08:34:09');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1117,29 +1055,26 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE IF NOT EXISTS `products` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `sku` varchar(50) NOT NULL,
-  `unit_price` decimal(10,2) NOT NULL,
-  `cost_price` decimal(10,2) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `category` varchar(100) DEFAULT NULL,
-  `production_status` enum('raw','finished','semi-finished') DEFAULT 'raw',
-  `unit_type` enum('kg','ml','adet','gram','litre','metre','paket') DEFAULT 'adet',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sku` (`sku`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `price` decimal(10,2) NOT NULL,
+  `stock_quantity` int DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `sku`, `unit_price`, `cost_price`, `created_at`, `category`, `production_status`, `unit_type`) VALUES
-(1, 'Ürün 1', 'PRD001', 100.00, 80.00, '2025-09-02 08:40:14', NULL, 'raw', 'adet'),
-(2, 'Ürün 2', 'PRD002', 100.00, 80.00, '2025-09-02 08:40:14', NULL, 'raw', 'adet'),
-(3, 'Un', 'UN001', 10.50, 8.00, '2025-09-09 16:41:48', 'Gıda', 'raw', 'kg'),
-(4, 'Ekmek', 'EK001', 5.00, 4.00, '2025-09-09 16:41:48', 'Gıda', 'finished', 'adet'),
-(5, 'Hamur', 'HM001', 3.00, 2.50, '2025-09-09 16:41:48', 'Gıda', 'semi-finished', 'kg'),
-(6, 'Süt', 'ST001', 12.00, 9.50, '2025-09-09 16:41:48', 'İçecek', 'raw', 'litre'),
-(7, 'Peynir', 'PY001', 25.00, 20.00, '2025-09-09 16:41:48', 'Süt Ürünleri', 'finished', 'paket');
+INSERT INTO `products` (`id`, `name`, `price`, `stock_quantity`, `created_at`) VALUES
+(1, 'SÖZCÜ GAZETESİ', 25.00, 14, '2025-09-12 11:35:01'),
+(2, 'POSTA GAZETESİ', 20.00, 28, '2025-09-12 11:45:21'),
+(3, 'AKŞAM GAZETESİ', 15.00, 14, '2025-09-12 12:00:23'),
+(4, 'U.200 ML CAM FRUTTİ ELMA', 10.42, 48, '2025-09-12 15:36:34'),
+(5, 'U.200 ML CAM FRUTTİ LİMON', 10.42, 120, '2025-09-12 15:36:56'),
+(6, 'CAN PEPSİ 330ML', 36.45, 0, '2025-09-13 00:10:14'),
+(7, 'KINIK MADEN SUYU', 8.33, 0, '2025-09-13 00:10:41'),
+(8, 'BUZDAĞI 0.5LT PET SU', 5.00, 0, '2025-09-13 00:11:05'),
+(9, 'CAN LİPTON İCE TEA ŞEFTALİ', 34.44, 0, '2025-09-13 00:11:25');
 
 -- --------------------------------------------------------
 
@@ -1199,14 +1134,7 @@ CREATE TABLE IF NOT EXISTS `recipes` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `recipes`
---
-
-INSERT INTO `recipes` (`id`, `name`, `product_id`, `total_cost`, `created_at`) VALUES
-(1, 'ekmek reçete', 4, 99.00, '2025-09-09 16:47:46');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1225,15 +1153,7 @@ CREATE TABLE IF NOT EXISTS `recipe_details` (
   PRIMARY KEY (`id`),
   KEY `recipe_id` (`recipe_id`),
   KEY `raw_material_id` (`raw_material_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `recipe_details`
---
-
-INSERT INTO `recipe_details` (`id`, `recipe_id`, `raw_material_id`, `quantity`, `unit_type`, `cost_per_unit`) VALUES
-(5, 1, 6, 2, 'kg', 9.50),
-(4, 1, 3, 10, 'kg', 8.00);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1252,19 +1172,7 @@ CREATE TABLE IF NOT EXISTS `reminders` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `title` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `reminders`
---
-
-INSERT INTO `reminders` (`id`, `type`, `related_id`, `due_date`, `status`, `notification_date`, `created_at`, `title`) VALUES
-(1, 'credit', 1, '2026-09-01', 'dismissed', NULL, '2025-09-02 08:51:51', NULL),
-(2, 'invoice', 1, '2025-09-30', 'pending', '2025-09-02 14:57:11', '2025-09-02 09:01:08', NULL),
-(3, 'salary', 1, '2025-09-02', 'dismissed', '2025-09-02 14:52:45', '2025-09-02 11:52:59', NULL),
-(4, 'invoice', 2, '2025-09-10', 'pending', NULL, '2025-09-02 11:57:44', NULL),
-(5, 'credit', 2, '2025-11-30', 'dismissed', NULL, '2025-09-03 13:15:22', NULL),
-(6, 'invoice', 5, '2025-10-20', 'pending', NULL, '2025-09-04 09:09:24', 0);
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1278,18 +1186,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `roles`
---
-
-INSERT INTO `roles` (`id`, `name`) VALUES
-(1, 'personel'),
-(2, 'müdür'),
-(3, 'muhasebeci'),
-(4, 'yönetici'),
-(5, 'admin');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1309,16 +1206,17 @@ CREATE TABLE IF NOT EXISTS `salary_advances` (
   PRIMARY KEY (`id`),
   KEY `personnel_id` (`personnel_id`),
   KEY `transaction_id` (`transaction_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `salary_advances`
 --
 
 INSERT INTO `salary_advances` (`id`, `personnel_id`, `transaction_id`, `amount`, `currency`, `description`, `created_at`) VALUES
-(1, 1, 0, 5000.00, 'TRY', '', '2025-09-02 18:22:07'),
-(2, 1, 0, 2000.00, 'TRY', '', '2025-09-02 18:22:41'),
-(3, 1, 0, 100.00, 'TRY', 'test', '2025-09-02 19:38:51');
+(24, 2, 0, 6000.00, 'TRY', '', '2025-09-06 21:00:00'),
+(23, 3, 0, 7000.00, 'TRY', '', '2025-09-06 21:00:00'),
+(22, 4, 0, 3000.00, 'TRY', '', '2025-09-02 21:00:00'),
+(21, 1, 0, 2800.00, 'TRY', 'ÇIKIŞ', '2025-09-02 21:00:00');
 
 -- --------------------------------------------------------
 
@@ -1364,14 +1262,7 @@ CREATE TABLE IF NOT EXISTS `sales_invoices` (
   PRIMARY KEY (`id`),
   KEY `customer_id` (`customer_id`),
   KEY `inventory_id` (`inventory_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `sales_invoices`
---
-
-INSERT INTO `sales_invoices` (`id`, `customer_id`, `inventory_id`, `quantity`, `invoice_number`, `amount`, `currency`, `amount_try`, `issue_date`, `due_date`, `status`, `description`, `created_at`) VALUES
-(1, 1, 1, 10, 'INV-001', 0.00, 'TRY', 500.00, '2025-09-02', '2025-09-09', 'pending', NULL, '2025-09-02 19:15:11');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1396,6 +1287,45 @@ CREATE TABLE IF NOT EXISTS `sales_payments` (
 -- --------------------------------------------------------
 
 --
+-- Tablo için tablo yapısı `settings`
+--
+
+DROP TABLE IF EXISTS `settings`;
+CREATE TABLE IF NOT EXISTS `settings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `setting_key` varchar(255) NOT NULL,
+  `setting_value` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Tablo döküm verisi `settings`
+--
+
+INSERT INTO `settings` (`id`, `setting_key`, `setting_value`) VALUES
+(1, 'sms_enabled', '1'),
+(2, 'email_enabled', '1'),
+(3, 'global_credit_limit', '100000.00'),
+(4, 'default_cash_account_id', '3'),
+(5, 'theme', 'light'),
+(6, 'primary_color', '#003087'),
+(7, 'font_family', 'Roboto'),
+(8, 'logo_url', 'assets/images/logo.png'),
+(9, 'favicon_url', 'assets/images/favicon.ico'),
+(10, 'sidebar_layout', 'fixed'),
+(11, 'records_per_page', '10'),
+(12, 'sms_enabled', '1'),
+(13, 'email_enabled', '1'),
+(14, 'global_credit_limit', '100000'),
+(15, 'default_cash_account_id', '3'),
+(16, 'sms_enabled', '1'),
+(17, 'email_enabled', '1'),
+(18, 'global_credit_limit', '100000'),
+(19, 'default_cash_account_id', '3');
+
+-- --------------------------------------------------------
+
+--
 -- Tablo için tablo yapısı `stock_movements`
 --
 
@@ -1411,18 +1341,7 @@ CREATE TABLE IF NOT EXISTS `stock_movements` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   KEY `warehouse_id` (`warehouse_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `stock_movements`
---
-
-INSERT INTO `stock_movements` (`id`, `product_id`, `warehouse_id`, `quantity`, `type`, `description`, `created_at`) VALUES
-(1, 1, 1, 100, 'in', NULL, '2025-09-09 16:41:48'),
-(2, 2, 1, 50, 'in', NULL, '2025-09-09 16:41:48'),
-(3, 3, 1, 30, 'in', NULL, '2025-09-09 16:41:48'),
-(4, 4, 1, 200, 'in', NULL, '2025-09-09 16:41:48'),
-(5, 5, 1, 20, 'in', NULL, '2025-09-09 16:41:48');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1440,16 +1359,7 @@ CREATE TABLE IF NOT EXISTS `stock_transactions` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `inventory_id` (`inventory_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Tablo döküm verisi `stock_transactions`
---
-
-INSERT INTO `stock_transactions` (`id`, `inventory_id`, `transaction_type`, `quantity`, `description`, `created_at`) VALUES
-(1, 1, 'exit', 5, '', '2025-09-03 13:09:58'),
-(2, 1, 'exit', 45, '', '2025-09-04 22:16:41'),
-(3, 1, 'exit', 45, '', '2025-09-04 22:16:46');
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -1462,6 +1372,7 @@ CREATE TABLE IF NOT EXISTS `suppliers` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `balance` decimal(15,2) DEFAULT '0.00',
+  `currency` varchar(3) DEFAULT 'TRY',
   `contact_name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
@@ -1470,14 +1381,16 @@ CREATE TABLE IF NOT EXISTS `suppliers` (
   `contact` varchar(100) DEFAULT NULL,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `suppliers`
 --
 
-INSERT INTO `suppliers` (`id`, `name`, `balance`, `contact_name`, `email`, `phone`, `address`, `created_at`, `contact`, `updated_at`) VALUES
-(8, 'REİS GIDA', 28245.00, 'MUSTAFA', NULL, NULL, 'GELİBOLU', '2025-09-05 19:46:55', NULL, '2025-09-05 22:47:49');
+INSERT INTO `suppliers` (`id`, `name`, `balance`, `currency`, `contact_name`, `email`, `phone`, `address`, `created_at`, `contact`, `updated_at`) VALUES
+(1, 'KEMAL ATEŞ', 7353.06, 'TRY', 'KEMAL ATEŞ', 'alaskan_17@hotmail.com', '00000000000', 'ÇANAKKALE, ECEABAT', '2025-09-09 20:58:05', NULL, '2025-09-12 16:52:21'),
+(2, 'REİS GIDA', 15605.00, 'TRY', 'MUSTAFA', 'test@test.com', '00000000000', 'ÇANAKKALE, GELİBOLU', '2025-09-09 21:03:21', NULL, '2025-09-11 18:35:03'),
+(3, 'GAZETECİ', 1120.00, 'TRY', 'CAHİT', 'gazete@test.com', '00000000000', 'ÇANAKKALE, ECEABAT', '2025-09-11 13:26:49', NULL, '2025-09-12 16:25:56');
 
 -- --------------------------------------------------------
 
@@ -1497,7 +1410,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `avatar` varchar(255) NOT NULL DEFAULT 'https://bootdey.com/img/Content/user_1.jpg',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Tablo döküm verisi `users`
@@ -1505,8 +1418,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `name`, `email`, `role`, `created_at`, `avatar`) VALUES
 (1, 'admin', '$2y$10$KY7A2hyPj2EshTlfcTZ0he8kfsH0O2NLnxUMYwhrFJLU1yZLUyY6e', 'Yönetici', 'admin@example.com', 'admin', '2025-09-02 15:41:08', 'https://bootdey.com/img/Content/user_1.jpg'),
-(2, 'Kate', '', '', 'kate@example.com', 'user', '2025-09-07 08:17:14', 'https://bootdey.com/img/Content/user_3.jpg'),
-(4, 'take', '', '', 'kate@example.com', 'user', '2025-09-07 08:17:14', 'https://bootdey.com/img/Content/user_2.jpg');
+(2, 'serapekemen', '$2y$10$KY7A2hyPj2EshTlfcTZ0he8kfsH0O2NLnxUMYwhrFJLU1yZLUyY6e', 'Yönetici', 'kate@example.com', 'admin', '2025-09-07 08:17:14', 'https://bootdey.com/img/Content/user_3.jpg'),
+(5, 'test', '$2y$10$TahUBtOW1ImkJsCf7n3sI.NsoNYlYe9q6LT9RLfrHJpQsZLkig/6G', '', 'test@test.com', 'user', '2025-09-11 21:16:34', 'https://bootdey.com/img/Content/user_1.jpg');
 
 -- --------------------------------------------------------
 
@@ -1556,8 +1469,19 @@ CREATE TABLE IF NOT EXISTS `warehouses` (
 --
 
 INSERT INTO `warehouses` (`id`, `name`, `location`, `created_at`) VALUES
-(1, 'Merkez Depo', 'İstanbul', '2025-09-02 08:40:14'),
-(2, 'Ana Depo', 'İstanbul', '2025-09-09 16:41:48');
+(1, 'ANA DEPO', 'ALÇITEPE', '2025-09-12 16:10:39'),
+(2, 'KÜÇÜK DÜKKAN', 'ALÇITEPE', '2025-09-12 16:11:09');
+
+--
+-- Dökümü yapılmış tablolar için kısıtlamalar
+--
+
+--
+-- Tablo kısıtlamaları `invoice_items`
+--
+ALTER TABLE `invoice_items`
+  ADD CONSTRAINT `invoice_items_ibfk_1` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `invoice_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE RESTRICT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
